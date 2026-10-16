@@ -14,9 +14,15 @@
 .dc-state.skipped { background: var(--warning-soft); color: var(--warning); }
 
 .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; padding: 4px; margin-top: 14px; }
-.metrics .m { padding: 12px; color: inherit; text-decoration: none; border-radius: 12px; min-width: 0; }
+.metrics .m { padding: 10px clamp(6px, 2.5vw, 12px); color: inherit; text-decoration: none; border-radius: 12px; min-width: 0; }
 .metrics .m + .m { border-left: 1px solid var(--border); border-radius: 0; }
 .metrics .m:hover { background: var(--primary-softer); }
 
 a.notice { text-decoration: none; }
 a.card { color: inherit; text-decoration: none; }
+
+.dash { display: block; }
+@media (min-width: 1024px) {
+  .dash { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 24px; align-items: start; }
+  .dash .col > .section-title:first-child { margin-top: 4px; }
+}

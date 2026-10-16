@@ -1,4 +1,4 @@
-<div class="page">
+<div class="page wide">
   @if (!children.selected() && children.loaded()) {
     <app-empty-state title="Dodajte prvo dete" text="Svi podaci u aplikaciji vezani su za izabrano dete." image="illustrations/boy-backpack.png">
       <a class="btn primary" routerLink="/app/children/new">Dodaj dete</a>
@@ -10,6 +10,7 @@
     <div style="height:12px"></div>
     <app-loading [rows]="3" [height]="80" />
   } @else {
+    <div class="dash"><div class="col">
     <!-- TODAY -->
     <section aria-labelledby="today-h">
       <div class="section-title" style="margin-top:4px">
@@ -94,6 +95,7 @@
       <a routerLink="/app/therapy" class="m"><app-metric-card label="Terapija" [value]="activeMed() ? fmt(activeMed()!.current_dose, 3) + ' ' + activeMed()!.dose_unit : ''" [hint]="activeMed() ? activeMed()!.name : 'Nije uneta'" /></a>
     </section>
 
+    </div><div class="col">
     <!-- NEXT VISIT -->
     <div class="section-title"><h3>Sledeće</h3><a routerLink="/app/calendar">Kalendar</a></div>
     <div class="stack sm">
@@ -162,6 +164,7 @@
         <p class="muted small">Još nema aktivnosti.</p>
       }
     </div>
+    </div></div>
   }
 </div>
 

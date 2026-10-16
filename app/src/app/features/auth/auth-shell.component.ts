@@ -23,7 +23,7 @@ import { LogoComponent } from '../../shared/ui/basics';
       </div>
     </div>`,
   styles: [`
-    .auth { min-height: 100vh; display: grid; background: linear-gradient(180deg, #eef5ff 0%, #f8fbff 55%, #fdf7f1 100%); }
+    .auth { min-height: 100vh; min-height: 100dvh; display: grid; background: linear-gradient(180deg, #eef5ff 0%, #f8fbff 55%, #fdf7f1 100%); }
     .hero { display: none; }
     .panel { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(28px + var(--safe-top)) 18px 28px; gap: 18px; }
     .brand { display: flex; flex-direction: column; align-items: center; gap: 6px; }

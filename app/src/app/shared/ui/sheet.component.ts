@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, effect, HostListener, inject, input, output, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, effect, HostListener, input, OnDestroy, output, viewChild } from '@angular/core';
 import { IconComponent } from './icon.component';
 
 /**
@@ -41,7 +41,7 @@ import { IconComponent } from './icon.component';
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SheetComponent {
+export class SheetComponent implements OnDestroy {
   readonly open = input(false);
   readonly title = input('');
   readonly closed = output<void>();
@@ -63,6 +63,11 @@ export class SheetComponent {
         (this.previousFocus as HTMLElement | null)?.focus?.();
       }
     });
+  }
+
+  /** Never leave the page scroll-locked if the sheet is destroyed while open (e.g. navigation). */
+  ngOnDestroy(): void {
+    if (this.panel()) document.body.style.overflow = '';
   }
 
   @HostListener('document:keydown.escape')

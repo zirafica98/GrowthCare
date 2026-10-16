@@ -158,8 +158,8 @@ export class ErrorStateComponent {
       <ng-content />
     </header>`,
   styles: [`
-    .ph { display: flex; align-items: center; gap: 6px; margin: 2px 0 16px; min-height: 44px; }
-    .ph h1 { font-size: 22px; }
+    .ph { display: flex; align-items: center; gap: 6px; margin: 0 0 10px; min-height: 40px; }
+    .ph h1 { font-size: 21px; }
     @media (min-width: 1024px) { .ph h1 { font-size: 26px; } }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -187,7 +187,7 @@ export class PageHeaderComponent {
   styles: [`
     .mc { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
     .label { font-size: 13px; color: var(--text-2); font-weight: 600; }
-    .value { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
+    .value { font-size: clamp(15px, 4.6vw, 20px); font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .hint { font-size: 12px; color: var(--text-3); }
     .hint.up { color: var(--success); font-weight: 600; }
   `],
