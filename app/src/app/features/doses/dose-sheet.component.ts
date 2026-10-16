@@ -110,11 +110,11 @@ import { SheetComponent } from '../../shared/ui/sheet.component';
       }
     </app-sheet>`,
   styles: [`
-    .summary { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--primary-softer); border: 1px solid #dfe9fb; }
-    .react { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; border: 1px solid var(--border-strong); background: #fff; cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
-    .react[aria-pressed='true'].great { background: var(--success-soft); border-color: #a7dfc5; color: var(--success); }
-    .react[aria-pressed='true'].redness { background: var(--warning-soft); border-color: #f2d49b; color: var(--warning); }
-    .react[aria-pressed='true'].other { background: var(--primary-soft); border-color: #bcd3fb; color: var(--primary-strong); }
+    .summary { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; background: var(--primary-softer); border: 1px solid var(--primary-border); }
+    .react { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px; border-radius: 14px; border: 1px solid var(--border-strong); background: var(--card); cursor: pointer; font-size: 12.5px; font-weight: 600; color: var(--text-2); }
+    .react[aria-pressed='true'].great { background: var(--success-soft); border-color: var(--success-border); color: var(--success); }
+    .react[aria-pressed='true'].redness { background: var(--warning-soft); border-color: var(--warning-border); color: var(--warning); }
+    .react[aria-pressed='true'].other { background: var(--primary-soft); border-color: var(--primary-border); color: var(--primary-strong); }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

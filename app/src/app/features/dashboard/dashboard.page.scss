@@ -1,9 +1,9 @@
 .dose-card {
-  background: #fff; border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow);
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow);
   padding: 16px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 10px;
 }
-.dose-card.pending { border-color: #cfe0fb; background: linear-gradient(180deg, #fff 0%, #f5f9ff 100%); }
-.dose-card.missed { border-color: #f4c9c9; }
+.dose-card.pending { border-color: var(--primary-border); background: linear-gradient(180deg, #fff 0%, var(--primary-softer) 100%); }
+.dose-card.missed { border-color: var(--danger-border); }
 .dc-head { display: flex; align-items: center; gap: 12px; }
 .dc-med { font-weight: 700; font-size: 17px; }
 .dc-dose { font-size: 15px; font-weight: 600; }

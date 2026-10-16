@@ -106,7 +106,7 @@
     <div class="stack">
       <div class="notice info"><app-icon name="info" [size]="18" /><span>Unesite novu dozu tačno kako ju je propisao lekar za {{ children.selected()?.first_name }}.</span></div>
       <div class="grid-2">
-        <div class="field"><span class="label">Prethodna doza</span><div class="input num" style="display:flex;align-items:center;background:#f6f8fb">{{ fmt(m.current_dose) }} {{ m.dose_unit }}</div></div>
+        <div class="field"><span class="label">Prethodna doza</span><div class="input num" style="display:flex;align-items:center;background:var(--skel-2)">{{ fmt(m.current_dose) }} {{ m.dose_unit }}</div></div>
         <div class="field"><label for="c-new">Nova doza</label><div class="input-group"><input id="c-new" class="input num" type="number" inputmode="decimal" step="0.01" min="0" [(ngModel)]="cNewDose" /><span class="addon">{{ m.dose_unit }}</span></div></div>
       </div>
       <div class="field"><label for="c-date">Važi od</label><input id="c-date" class="input" type="date" [(ngModel)]="cDate" /></div>

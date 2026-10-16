@@ -91,7 +91,7 @@ type Step = 'family' | 'child' | 'therapy' | 'invite' | 'notifications';
     .setup { max-width: 560px; margin: 0 auto; padding: calc(16px + var(--safe-top)) 16px 40px; display: flex; flex-direction: column; gap: 18px; }
     .steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 6px; }
     .steps li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11.5px; color: var(--text-3); text-align: center; }
-    .dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: #e9eef6; font-weight: 700; color: var(--text-2); }
+    .dot { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-2); font-weight: 700; color: var(--text-2); }
     .steps li.current .dot { background: var(--primary); color: #fff; }
     .steps li.done .dot { background: var(--success-soft); color: var(--success); }
     .steps li.current { color: var(--text); font-weight: 600; }

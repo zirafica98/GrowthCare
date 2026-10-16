@@ -57,12 +57,12 @@ const RENDER_WIDTH = 1400;
       </div>
     }`,
   styles: [`
-    .pv { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #eef2f7; border: 1px solid var(--border); display: grid; place-items: center; }
+    .pv { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: var(--surface-2); border: 1px solid var(--border); display: grid; place-items: center; }
     .pages { all: unset; display: block; width: 100%; height: 100%; overflow-y: auto; cursor: zoom-in; -webkit-overflow-scrolling: touch; }
     .pages:focus-visible { outline: 3px solid rgba(79,139,247,.5); outline-offset: -3px; }
-    .pages img { width: 100%; height: 100%; object-fit: contain; background: #f7f9fc; display: block; }
+    .pages img { width: 100%; height: 100%; object-fit: contain; background: var(--surface-2); display: block; }
     .pdf-host { display: flex; flex-direction: column; gap: 8px; padding: 8px; }
-    .pdf-host ::ng-deep canvas { width: 100%; height: auto; display: block; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.12); border-radius: 4px; }
+    .pdf-host ::ng-deep canvas { width: 100%; height: auto; display: block; background: var(--card); box-shadow: 0 1px 4px rgba(0,0,0,.12); border-radius: 4px; }
     .hint { position: absolute; right: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 99px; background: rgba(28,39,64,.7); color: #fff; font-size: 11.5px; pointer-events: none; }
     .msg { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text-2); text-align: center; padding: 16px; }
     .full { position: fixed; inset: 0; z-index: 120; background: #1b2232; display: flex; flex-direction: column; }

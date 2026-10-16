@@ -54,7 +54,7 @@ export const TL_ICON: Record<TimelineType, { icon: string; tile: string }> = {
     .tl::before { content: ''; position: absolute; left: 20px; top: 8px; bottom: 8px; width: 2px; background: var(--border); }
     .tl li { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 8px 0; }
     .tl .icon-tile { position: relative; z-index: 1; box-shadow: 0 0 0 4px var(--bg); }
-    .body { display: flex; flex-direction: column; flex: 1; min-width: 0; color: inherit; text-decoration: none !important; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
+    .body { display: flex; flex-direction: column; flex: 1; min-width: 0; color: inherit; text-decoration: none !important; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 10px 12px; }
     .tl .badge { position: absolute; right: 10px; top: 16px; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,

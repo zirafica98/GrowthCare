@@ -26,7 +26,7 @@ import { MedicationFormComponent } from './medication-form.component';
     .kv { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; }
     .kv .k { font-size: 12.5px; color: var(--text-2); }
     .kv .v { font-weight: 650; }
-    .meter { height: 8px; border-radius: 99px; background: #eef2f7; overflow: hidden; }
+    .meter { height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
     .meter span { display: block; height: 100%; background: linear-gradient(90deg, var(--primary-tint), var(--primary)); }
     .meter.low span { background: var(--warning-accent); }
     .change { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }

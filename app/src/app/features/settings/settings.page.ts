@@ -8,6 +8,7 @@ import { NotificationPreferences } from '../../core/models/models';
 import { ChildService } from '../../core/services/child.service';
 import { FamilyService } from '../../core/services/family.service';
 import { NotificationService } from '../../core/services/notification.service';
+import { ThemeMode, ThemeService } from '../../core/services/theme.service';
 import { TimelineService } from '../../core/services/timeline.service';
 import { ToastService } from '../../core/services/toast.service';
 import { OfflineSyncService } from '../../core/sync/offline-sync.service';
@@ -30,6 +31,18 @@ type PrefKey = keyof Pick<NotificationPreferences, 'dose_enabled' | 'missed_dose
         <div class="field"><label for="s-name">Ime i prezime</label>
           <div class="row"><input id="s-name" class="input" [(ngModel)]="fullName" maxlength="80" /><button class="btn outline" type="button" (click)="saveName()">Sačuvaj</button></div></div>
         <div class="small muted">E-mail: {{ auth.user()?.email }}</div>
+      </section>
+
+      <div class="section-title"><h3>Izgled</h3></div>
+      <section class="card">
+        <div class="segmented" role="radiogroup" aria-label="Tema">
+          @for (t of themes; track t.v) {
+            <button type="button" role="radio" [attr.aria-checked]="theme.mode() === t.v" [attr.aria-selected]="theme.mode() === t.v" (click)="theme.set(t.v)">
+              <app-icon [name]="t.icon" [size]="16" /> {{ t.l }}
+            </button>
+          }
+        </div>
+        <p class="tiny muted" style="margin-top:8px">„Sistem” prati podešavanje telefona (svetla ili tamna tema).</p>
       </section>
 
       <div class="section-title"><h3>Porodica i deca</h3></div>
@@ -82,7 +95,7 @@ type PrefKey = keyof Pick<NotificationPreferences, 'dose_enabled' | 'missed_dose
       <button class="btn outline block" type="button" style="margin-top:18px" (click)="logout()"><app-icon name="logout" [size]="18" /> Odjava</button>
 
       <div class="section-title"><h3 style="color:var(--danger)">Opasna zona</h3></div>
-      <section class="card stack sm" style="border-color:#f3c9c9">
+      <section class="card stack sm" style="border-color:var(--danger-border)">
         @if (family.isOwner()) {
           <button class="btn danger-soft block" type="button" (click)="deleteFamily()">Obriši porodicu i sve podatke</button>
         }
@@ -93,6 +106,10 @@ type PrefKey = keyof Pick<NotificationPreferences, 'dose_enabled' | 'missed_dose
 })
 export class SettingsPage implements OnInit {
   readonly auth = inject(AuthService);
+  readonly theme = inject(ThemeService);
+  readonly themes: { v: ThemeMode; l: string; icon: string }[] = [
+    { v: 'light', l: 'Svetla', icon: 'sun' }, { v: 'dark', l: 'Tamna', icon: 'moon' }, { v: 'system', l: 'Sistem', icon: 'settings' },
+  ];
   readonly family = inject(FamilyService);
   readonly children = inject(ChildService);
   readonly notifications = inject(NotificationService);

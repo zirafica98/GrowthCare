@@ -41,7 +41,7 @@ function niceStep(range: number, ticks: number): number {
           <path [attr.d]="g.line" fill="none" [attr.stroke]="color()" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" />
         }
         @for (p of g.pts; track $index; let last = $last) {
-          <circle [attr.cx]="p.x" [attr.cy]="p.y" [attr.r]="last ? 5 : 3.2" [attr.fill]="last ? color() : '#fff'" [attr.stroke]="color()" stroke-width="2" />
+          <circle [attr.cx]="p.x" [attr.cy]="p.y" [attr.r]="last ? 5 : 3.2" [style.fill]="last ? color() : 'var(--card)'" [attr.stroke]="color()" stroke-width="2" />
         }
         @if (g.pts.length) {
           @let lp = g.pts[g.pts.length - 1];
@@ -58,8 +58,8 @@ function niceStep(range: number, ticks: number): number {
     :host { display: block; width: 100%; }
     .chart { margin: 0; width: 100%; overflow: hidden; position: relative; }
     svg { display: block; max-width: 100%; }
-    .grid { stroke: #e8eef6; stroke-width: 1; }
-    .tick { font-size: 11px; fill: #8a96aa; font-family: var(--font); }
+    .grid { stroke: var(--border); stroke-width: 1; }
+    .tick { font-size: 11px; fill: var(--text-3); font-family: var(--font); }
     .val { font-size: 12px; font-weight: 700; font-family: var(--font); }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -30,8 +30,8 @@ import { IconComponent } from './icon.component';
   styles: [`
     .logo { display: inline-flex; align-items: center; gap: 8px; }
     .logo.stacked { flex-direction: column; gap: 6px; }
-    .word { font-weight: 750; font-size: 22px; letter-spacing: -0.02em; color: #2459c2; }
-    .word b { font-weight: 750; color: #3d7cf0; }
+    .word { font-weight: 750; font-size: 22px; letter-spacing: -0.02em; color: var(--logo-a); }
+    .word b { font-weight: 750; color: var(--logo-b); }
     .stacked .word { font-size: 30px; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -127,7 +127,7 @@ export class LoadingSkeletonComponent {
       </div>
       @if (retryable()) { <button class="btn sm outline" type="button" (click)="retry.emit()">Pokušaj ponovo</button> }
     </div>`,
-  styles: [`.err { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 16px; background: #fff; border: 1px solid var(--border); }`],
+  styles: [`.err { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--border); }`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ErrorStateComponent {

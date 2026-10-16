@@ -5,6 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js';
 import { environment } from '../environments/environment';
 import { routes } from './app.routes';
 import { AuthService } from './core/auth/auth.service';
+import { ThemeService } from './core/services/theme.service';
 import { seedDemo } from './core/data/local/demo-seed';
 import { LocalAuthBackend } from './core/data/local/local-auth';
 import { LocalDb } from './core/data/local/local-db';
@@ -30,6 +31,7 @@ export const appConfig: ApplicationConfig = {
     provideBackend(),
     { provide: OCR_PROVIDER, useFactory: ocrProviderFactory },
     provideAppInitializer(() => {
+      inject(ThemeService);
       const auth = inject(AuthService);
       const seed = isDemoMode ? seedDemo(inject(LocalDb), inject(LocalAuthBackend)) : Promise.resolve();
       return seed.then(() => auth.init());

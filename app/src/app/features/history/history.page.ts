@@ -151,8 +151,8 @@ type Period = 7 | 30 | 90 | 365;
     .ok { color: var(--success); } .warn { color: var(--warning); } .bad { color: var(--danger); }
     .weeks { display: flex; flex-direction: column; gap: 10px; }
     .wk { display: grid; grid-template-columns: 92px 1fr 40px; align-items: center; gap: 10px; }
-    .bar { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: #eef2f7; }
-    .bar .g { background: var(--success-accent); } .bar .s { background: var(--warning-accent); } .bar .m { background: var(--danger-accent); } .bar .p { background: #cfd8e5; }
+    .bar { display: flex; height: 10px; border-radius: 99px; overflow: hidden; background: var(--surface-2); }
+    .bar .g { background: var(--success-accent); } .bar .s { background: var(--warning-accent); } .bar .m { background: var(--danger-accent); } .bar .p { background: var(--track); }
     .day { margin: 16px 4px 8px; font-size: 13px; color: var(--text-2); font-weight: 650; }
     .rowbtn { display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; color: inherit; }
     .audit { padding: 8px 10px; border-left: 3px solid var(--primary-soft); }

@@ -17,7 +17,7 @@ import { IconComponent } from './icon.component';
     </div>`,
   styles: [`
     .toasts { position: fixed; z-index: 100; left: 12px; right: 12px; top: calc(12px + var(--safe-top)); display: flex; flex-direction: column; gap: 8px; pointer-events: none; align-items: center; }
-    .toast { pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 16px; background: #fff; box-shadow: var(--shadow-lg); border: 1px solid var(--border); width: min(480px, 100%); font-size: 14px; font-weight: 500; animation: drop .2s ease; }
+    .toast { pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 14px; border-radius: 16px; background: var(--card); box-shadow: var(--shadow-lg); border: 1px solid var(--border); width: min(480px, 100%); font-size: 14px; font-weight: 500; animation: drop .2s ease; }
     .toast .icon-btn { width: 36px; height: 36px; }
     .toast.success app-icon:first-child { color: var(--success); }
     .toast.error app-icon:first-child { color: var(--danger); }
