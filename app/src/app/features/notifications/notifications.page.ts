@@ -6,7 +6,7 @@ import { relativeDays, toLocalTime } from '../../core/utils/dates';
 import { EmptyStateComponent, PageHeaderComponent } from '../../shared/ui/basics';
 import { IconComponent } from '../../shared/ui/icon.component';
 
-const ICON: Record<string, string> = {
+const ICON: Record<CenterItem['kind'], string> = {
   dose: 'syringe', missed_dose: 'alert', appointment: 'stethoscope', laboratory: 'flask', measurement: 'ruler', stock: 'package', custom: 'bell', sync: 'refresh',
 };
 
@@ -27,7 +27,7 @@ const ICON: Record<string, string> = {
       <div class="card" style="padding:4px 12px">
         @for (n of svc.items(); track n.key) {
           <button class="list-item" type="button" (click)="open(n)" [class.unread]="!svc.read().has(n.key)">
-            <span class="icon-tile sm" [class.warning]="n.tone === 'warning'" [class.success]="n.tone === 'success'"><app-icon [name]="icon[n.kind] ?? 'bell'" [size]="16" /></span>
+            <span class="icon-tile sm" [class.warning]="n.tone === 'warning'" [class.success]="n.tone === 'success'"><app-icon [name]="icon[n.kind]" [size]="16" /></span>
             <span class="grow">
               <b class="small">{{ n.title }}</b>
               <span class="tiny muted" style="display:block">{{ n.body }}</span>

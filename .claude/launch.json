@@ -4,7 +4,28 @@
     {
       "name": "growthcare",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "app", "start", "--", "--port", "4300"],
+      "runtimeArgs": [
+        "--prefix",
+        "app",
+        "start",
+        "--",
+        "--port",
+        "4300"
+      ],
+      "port": 4300
+    },
+    {
+      "name": "growthcare-supabase",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "app",
+        "run",
+        "start:supabase",
+        "--",
+        "--port",
+        "4300"
+      ],
       "port": 4300
     }
   ]

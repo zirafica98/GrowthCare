@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, OnDestroy, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, OnDestroy, signal, untracked } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MedicalDocument } from '../../core/models/models';
 import { DocumentService } from '../../core/services/document.service';
@@ -43,7 +43,8 @@ export class DocumentPreviewComponent implements OnDestroy {
   constructor() {
     effect(() => {
       const d = this.doc();
-      void this.load(d);
+      untracked(() => void this.load(d)); // load() reads url(); must not become a dependency
+
     });
   }
 

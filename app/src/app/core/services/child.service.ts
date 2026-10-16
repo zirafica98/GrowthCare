@@ -47,7 +47,7 @@ export class ChildService {
   }
 
   async load(familyId = this.family.current()?.id): Promise<void> {
-    if (!familyId) return;
+    if (!familyId || !this.auth.user()) return;
     const list = await this.data.list<Child>('children', q().eq('family_id', familyId).orderBy('date_of_birth'));
     this.children.set(list);
     this.loaded.set(true);

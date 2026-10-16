@@ -1,0 +1,24 @@
+# Minimal Supabase CLI config (local development: `supabase start`).
+project_id = "growthcare"
+
+[api]
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[auth]
+site_url = "http://localhost:4300"
+additional_redirect_urls = ["http://localhost:4300/**"]
+minimum_password_length = 8
+
+[auth.email]
+enable_confirmations = true
+
+[functions.ocr-extract]
+verify_jwt = true
+
+[functions.send-reminders]
+verify_jwt = false # protected by x-cron-secret

@@ -30,7 +30,7 @@ const GROWTH_FIELDS: FieldName[] = ['height_cm', 'weight_kg'];
     .frow { display: grid; grid-template-columns: 24px 1fr; gap: 10px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--border); }
     .frow:last-child { border-bottom: 0; }
     .frow input[type=checkbox] { width: 20px; height: 20px; margin-top: 30px; accent-color: var(--primary); }
-    .conf { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; }
+    .conf { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 99px; align-self: center; white-space: nowrap; }
     .conf.high { background: var(--success-soft); color: var(--success); }
     .conf.medium { background: var(--warning-soft); color: var(--warning); }
     .conf.low { background: var(--danger-soft); color: var(--danger); }

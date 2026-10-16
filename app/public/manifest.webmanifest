@@ -1,9 +1,9 @@
 {
-  "name": "growthcare",
-  "short_name": "growthcare",
+  "name": "GrowthCare — praćenje terapije i rasta",
+  "short_name": "GrowthCare",
   "display": "standalone",
-  "scope": "./",
-  "start_url": "./",
+  "scope": "/",
+  "start_url": "/app/dashboard",
   "icons": [
     {
       "src": "icons/icon-72x72.png",
@@ -53,5 +53,15 @@
       "type": "image/png",
       "purpose": "maskable any"
     }
+  ],
+  "description": "Privatna porodična aplikacija za praćenje terapije hormonom rasta, rasta, kontrola i nalaza.",
+  "lang": "sr-Latn",
+  "theme_color": "#2f6fe4",
+  "background_color": "#f5f8fc",
+  "orientation": "portrait",
+  "categories": [
+    "health",
+    "medical",
+    "lifestyle"
   ]
 }
