@@ -114,8 +114,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   .page { padding: 24px 32px 40px; max-width: 980px; }
   .page.wide { max-width: 1180px; }
 }
-/* No rubber-band "bounce" revealing empty space around the app shell. */
-html, body { overscroll-behavior-y: none; }
+
 
 /* ---------------------------------------------------------------- cards */
 .card {
@@ -274,4 +273,3 @@ button.list-item:hover, a.list-item:hover { background: var(--primary-softer); }
   margin: 4px -18px calc(-18px - var(--safe-bottom)); padding: 12px 18px calc(14px + var(--safe-bottom));
   background: linear-gradient(180deg, rgba(255,255,255,.85), #fff 30%); border-top: 1px solid var(--border);
 }
-html, body { overflow-x: clip; }

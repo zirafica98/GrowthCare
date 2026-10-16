@@ -10,9 +10,8 @@ main { flex: 1; outline: none; }
 /* ---------------------------------------------------------------- topbar */
 .topbar {
   position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 4px;
-  padding: calc(8px + var(--safe-top)) 12px 8px; background: rgba(245, 248, 252, .9);
-  backdrop-filter: saturate(1.4) blur(12px); -webkit-backdrop-filter: saturate(1.4) blur(12px);
-  border-bottom: 1px solid transparent;
+  padding: calc(8px + var(--safe-top)) 12px 8px; background: var(--bg);
+  border-bottom: 1px solid var(--border);
 }
 .child-switch {
   display: flex; align-items: center; gap: 10px; padding: 4px 10px 4px 4px; border-radius: 16px;
@@ -48,8 +47,7 @@ main { flex: 1; outline: none; }
 .bottom-nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 50; display: flex;
   height: calc(var(--nav-h) + var(--safe-bottom)); padding: 6px 6px var(--safe-bottom);
-  background: rgba(255, 255, 255, .96); border-top: 1px solid var(--border);
-  backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+  background: #fff; border-top: 1px solid var(--border);
 }
 .bn-item {
   flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
