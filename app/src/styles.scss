@@ -357,3 +357,12 @@ button.list-item:hover, a.list-item:hover { background: var(--primary-softer); }
 :root[data-theme='dark'] .btn.success { background: #1c9a6c; }
 :root[data-theme='dark'] .btn.danger { background: #c94545; }
 :root[data-theme='dark'] .switch input:checked + span { background: #1c9a6c; }
+
+/* iOS Safari gives date/time inputs an intrinsic min-width, so two of them in a
+   2-column grid overlap. Let them shrink like normal inputs. */
+input[type='date'].input, input[type='time'].input, input[type='datetime-local'].input {
+  -webkit-appearance: none; appearance: none; min-width: 0; max-width: 100%; display: block;
+}
+input[type='date'].input::-webkit-date-and-time-value,
+input[type='time'].input::-webkit-date-and-time-value { text-align: left; margin: 0; }
+.grid-2, .grid-3 { min-width: 0; }
