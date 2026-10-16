@@ -43,5 +43,8 @@ export abstract class AuthBackend {
   abstract signOut(): Promise<void>;
   abstract resetPassword(email: string): Promise<void>;
   abstract updatePassword(password: string): Promise<void>;
+  /** OAuth sign-in (redirects away). `next` is the in-app path to return to. */
+  abstract signInWithGoogle(next: string): Promise<void>;
+  readonly supportsOAuth: boolean = false;
   abstract onChange(cb: (user: AuthUser | null) => void): void;
 }

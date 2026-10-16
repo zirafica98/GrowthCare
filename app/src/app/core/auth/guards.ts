@@ -26,9 +26,12 @@ export const sessionGuard: CanActivateFn = async (_route, state) => {
 };
 
 /** Login/register pages redirect away when already signed in. */
-export const guestGuard: CanActivateFn = async () => {
+export const guestGuard: CanActivateFn = async (route) => {
   const auth = inject(AuthService);
   const router = inject(Router);
   await auth.init();
-  return auth.user() ? router.createUrlTree(['/app']) : true;
+  if (!auth.user()) return true;
+  // After an OAuth redirect the session exists already: continue to `next` (same-origin paths only).
+  const next = String(route.queryParamMap.get('next') ?? '');
+  return router.parseUrl(next.startsWith('/') && !next.startsWith('//') ? next : '/app');
 };

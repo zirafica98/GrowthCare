@@ -103,7 +103,7 @@ export class SupabaseAuthBackend extends AuthBackend {
 
   private toUser(u: { id: string; email?: string; user_metadata?: Record<string, unknown> } | null | undefined): AuthUser | null {
     if (!u) return null;
-    return { id: u.id, email: u.email ?? '', full_name: String(u.user_metadata?.['full_name'] ?? '') };
+    return { id: u.id, email: u.email ?? '', full_name: String(u.user_metadata?.['full_name'] ?? u.user_metadata?.['name'] ?? '') };
   }
 
   async restore(): Promise<AuthUser | null> {
@@ -132,6 +132,17 @@ export class SupabaseAuthBackend extends AuthBackend {
 
   async signOut(): Promise<void> {
     await this.sb.auth.signOut();
+  }
+
+  override readonly supportsOAuth = true;
+
+  async signInWithGoogle(next: string): Promise<void> {
+    const safeNext = next.startsWith('/') && !next.startsWith('//') ? next : '/app';
+    const { error } = await this.sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${location.origin}/login?next=${encodeURIComponent(safeNext)}`, queryParams: { prompt: 'select_account' } },
+    });
+    if (error) throw appError('auth', error, 'Prijava preko Google-a nije uspela.');
   }
 
   async resetPassword(email: string): Promise<void> {

@@ -54,6 +54,12 @@ export class AuthService {
     return res;
   }
 
+  readonly supportsOAuth = this.auth.supportsOAuth;
+
+  signInWithGoogle(next = '/app'): Promise<void> {
+    return this.auth.signInWithGoogle(next);
+  }
+
   resetPassword(email: string): Promise<void> {
     return this.auth.resetPassword(email.trim());
   }

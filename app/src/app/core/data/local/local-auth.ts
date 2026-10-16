@@ -68,6 +68,10 @@ export class LocalAuthBackend extends AuthBackend {
     this.emit(null);
   }
 
+  async signInWithGoogle(): Promise<void> {
+    throw appError('auth', null, 'Google prijava radi samo sa Supabase serverom (ne u demo režimu).');
+  }
+
   async resetPassword(): Promise<void> {
     // Demo mode has no e-mail delivery. The UI explains this.
   }
