@@ -66,6 +66,17 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "supabase": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.supabase.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -78,6 +89,9 @@
             },
             "development": {
               "buildTarget": "growthcare:build:development"
+            },
+            "supabase": {
+              "buildTarget": "growthcare:build:supabase"
             }
           },
           "defaultConfiguration": "development"

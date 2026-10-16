@@ -1,0 +1,159 @@
+<div class="page">
+  <app-page-header title="Terapija" [subtitle]="children.selected()?.first_name ?? ''">
+    @if (active().length) { <button class="btn sm outline" type="button" (click)="medForm.set('new')"><app-icon name="plus" [size]="16" /> Lek</button> }
+  </app-page-header>
+
+  <div class="segmented" role="tablist">
+    <button type="button" role="tab" [attr.aria-selected]="tab() === 'current'" (click)="tab.set('current')">Trenutna terapija</button>
+    <button type="button" role="tab" [attr.aria-selected]="tab() === 'history'" (click)="tab.set('history')">Istorija</button>
+  </div>
+  <div style="height:12px"></div>
+
+  @if (data.error()) {
+    <app-error-state [message]="data.error()!.message" (retry)="data.reload()" />
+  } @else if (data.loading()) {
+    <app-loading [rows]="2" [height]="160" />
+  } @else if (tab() === 'current') {
+    @if (med(); as m) {
+      @if (active().length > 1) {
+        <div class="chips" style="margin-bottom:10px">
+          @for (a of active(); track a.id) { <button type="button" class="chip" [attr.aria-pressed]="a.id === m.id" (click)="selectedMed.set(a.id)">{{ a.name }}</button> }
+        </div>
+      }
+      <section class="card stack">
+        <div class="row">
+          <div class="icon-tile"><app-icon name="syringe" /></div>
+          <div class="grow"><h3>{{ m.name }}</h3><div class="small muted">{{ m.substance || 'Hormon rasta' }}{{ m.strength ? ' · ' + m.strength : '' }}</div></div>
+          <button class="icon-btn" type="button" (click)="medForm.set(m)" aria-label="Izmeni terapiju"><app-icon name="edit" [size]="20" /></button>
+        </div>
+        <div>
+          <div class="small muted">Trenutna zabeležena doza</div>
+          <div class="row" style="align-items:baseline"><span class="hero-dose num">{{ fmt(m.current_dose) }} {{ m.dose_unit }}</span>
+            @if (periods()[0]; as p) { <span class="small muted">od {{ fmtDate(p.from) }}</span> }</div>
+        </div>
+        <div class="kv">
+          <div><div class="k">Učestalost</div><div class="v">{{ freqLabel(m.frequency) }}</div></div>
+          <div><div class="k">Vreme</div><div class="v">{{ m.scheduled_time }}</div></div>
+          <div><div class="k">Početak terapije</div><div class="v">{{ fmtDate(m.start_date) || '—' }}</div></div>
+          <div><div class="k">Sledeća doza</div><div class="v">{{ nextDose() ? fmtDateTime(nextDose()!.scheduledFor) : '—' }}</div></div>
+          @if (m.prescribing_doctor) { <div><div class="k">Propisao</div><div class="v">{{ m.prescribing_doctor }}</div></div> }
+        </div>
+
+        @for (si of stockInfo(); track si.s.id) {
+          <button class="card flat tight" type="button" style="text-align:left; cursor:pointer" (click)="openStock(si.s)">
+            <div class="row between small"><span class="muted">Preostalo u pakovanju (procena)</span><b>{{ si.est.daysLeft !== null ? '~ ' + si.est.daysLeft + ' dana' : '—' }}</b></div>
+            <div class="meter" [class.low]="si.est.daysLeft !== null && si.est.daysLeft <= si.s.reminder_threshold_days" style="margin:8px 0"><span [style.width.%]="si.pct"></span></div>
+            <div class="tiny muted">{{ si.s.package_name }} · ostalo ~{{ fmt(si.est.remaining) }} {{ m.dose_unit }} od {{ fmt(si.s.total_amount * si.s.quantity) }}{{ si.expiryDays !== null ? ' · rok za ' + si.expiryDays + ' dana' : '' }}</div>
+          </button>
+        } @empty {
+          <button class="btn ghost sm" type="button" style="align-self:flex-start" (click)="openStock(null)"><app-icon name="package" [size]="16" /> Prati zalihu leka</button>
+        }
+
+        <button class="btn outline primary-text block" type="button" (click)="openChange()"><app-icon name="edit" [size]="18" /> Unesi promenu doze</button>
+      </section>
+
+      <div class="section-title"><h3>Promena doze</h3></div>
+      <div class="card" style="padding:4px 16px">
+        @for (p of periods(); track p.change.id) {
+          <div class="change">
+            <span class="dot" [class.current]="p.current" aria-hidden="true"></span>
+            <b class="num" style="min-width:70px">{{ fmt(p.change.new_dose) }} {{ p.change.dose_unit }}</b>
+            <span class="small muted grow">{{ fmtDate(p.from) }} – {{ p.to ? fmtDate(p.to) : 'danas' }}</span>
+            @if (p.change.note) { <span class="tiny subtle ellipsis" style="max-width:40%">{{ p.change.note }}</span> }
+          </div>
+        }
+      </div>
+      <p class="tiny muted" style="margin:10px 4px">GrowthCare beleži propisanu terapiju i ne preporučuje niti menja doze. Svaku promenu unosi roditelj prema uputstvu lekara.</p>
+    } @else {
+      <app-empty-state title="Nema aktivne terapije" text="Dodajte lek koji je propisao lekar, sa dozom i vremenom primene." image="illustrations/f-injection.png">
+        <button class="btn primary" type="button" (click)="medForm.set('new')">Dodaj terapiju</button>
+      </app-empty-state>
+    }
+  } @else {
+    <div class="card" style="padding:4px 16px">
+      @for (c of data.value()?.changes ?? []; track c.id) {
+        <div class="change">
+          <div class="icon-tile sm"><app-icon name="pill" [size]="16" /></div>
+          <div class="grow">
+            <b class="small">{{ c.previous_dose == null ? 'Početak terapije' : 'Promena doze' }}</b>
+            <div class="tiny muted">{{ fmtDate(c.changed_at) }} · {{ c.previous_dose == null ? '' : fmt(c.previous_dose) + ' → ' }}{{ fmt(c.new_dose) }} {{ c.dose_unit }}{{ c.note ? ' · ' + c.note : '' }}</div>
+          </div>
+          <span class="badge">{{ c.source_type === 'doctor_visit' ? 'Kontrola' : c.source_type === 'document' ? 'Dokument' : 'Ručno' }}</span>
+        </div>
+      } @empty { <p class="muted small" style="padding:12px 0">Nema promena.</p> }
+    </div>
+    @if (inactive().length) {
+      <div class="section-title"><h3>Završene terapije</h3></div>
+      <div class="card" style="padding:4px 16px">
+        @for (m of inactive(); track m.id) {
+          <div class="change"><div class="grow"><b class="small">{{ m.name }}</b><div class="tiny muted">{{ fmtDate(m.start_date) }} – {{ fmtDate(m.end_date) }} · {{ fmt(m.current_dose) }} {{ m.dose_unit }}</div></div></div>
+        }
+      </div>
+    }
+    @if (med(); as m) { <button class="btn ghost danger-text" type="button" style="margin-top:12px; color:var(--danger)" (click)="stop(m)">Završi terapiju {{ m.name }}</button> }
+  }
+</div>
+
+<app-sheet [open]="!!medForm()" [title]="medForm() === 'new' ? 'Nova terapija' : 'Izmeni terapiju'" (closed)="medForm.set(null)">
+  @if (medForm(); as f) {
+    <app-medication-form [initial]="f === 'new' ? null : f" [busy]="busy()" (saved)="addMedication($event)" />
+    @if (f !== 'new') { <p class="tiny muted" style="margin-top:8px">Dozu menjate preko „Unesi promenu doze”, da bi promena ostala zabeležena.</p> }
+  }
+</app-sheet>
+
+<app-sheet [open]="changeOpen()" title="Promena doze" (closed)="changeOpen.set(false)">
+  @if (med(); as m) {
+    <div class="stack">
+      <div class="notice info"><app-icon name="info" [size]="18" /><span>Unesite novu dozu tačno kako ju je propisao lekar za {{ children.selected()?.first_name }}.</span></div>
+      <div class="grid-2">
+        <div class="field"><span class="label">Prethodna doza</span><div class="input num" style="display:flex;align-items:center;background:#f6f8fb">{{ fmt(m.current_dose) }} {{ m.dose_unit }}</div></div>
+        <div class="field"><label for="c-new">Nova doza</label><div class="input-group"><input id="c-new" class="input num" type="number" inputmode="decimal" step="0.01" min="0" [(ngModel)]="cNewDose" /><span class="addon">{{ m.dose_unit }}</span></div></div>
+      </div>
+      <div class="field"><label for="c-date">Važi od</label><input id="c-date" class="input" type="date" [(ngModel)]="cDate" /></div>
+      <div class="field"><span class="label">Izvor</span>
+        <div class="segmented">
+          <button type="button" [attr.aria-selected]="cSource === 'doctor_visit'" (click)="cSource = 'doctor_visit'">Kontrola</button>
+          <button type="button" [attr.aria-selected]="cSource === 'document'" (click)="cSource = 'document'">Dokument</button>
+          <button type="button" [attr.aria-selected]="cSource === 'manual'" (click)="cSource = 'manual'">Ručno</button>
+        </div>
+      </div>
+      @if (cSource === 'doctor_visit') {
+        <div class="field"><label for="c-visit">Kontrola</label>
+          <select id="c-visit" class="select" [(ngModel)]="cVisit"><option value="">— bez povezivanja —</option>
+            @for (v of data.value()?.visits ?? []; track v.id) { <option [value]="v.id">{{ fmtDate(v.scheduled_at) }} · {{ v.reason || 'Kontrola' }}</option> }
+          </select></div>
+      }
+      @if (cSource === 'document') {
+        <div class="field"><label for="c-doc">Dokument</label>
+          <select id="c-doc" class="select" [(ngModel)]="cDoc"><option value="">— bez povezivanja —</option>
+            @for (d of data.value()?.documents ?? []; track d.id) { <option [value]="d.id">{{ fmtDate(d.document_date) }} · {{ d.title }}</option> }
+          </select></div>
+      }
+      <div class="field"><label for="c-note">Napomena (opciono)</label><input id="c-note" class="input" [(ngModel)]="cNote" maxlength="300" /></div>
+      @if (cNewDose && cNewDose !== m.current_dose) {
+        <div class="notice success"><app-icon name="check-circle" [size]="18" /><span>Zabeležena doza se menja sa <b>{{ fmt(m.current_dose) }}</b> na <b>{{ fmt(cNewDose) }} {{ m.dose_unit }}</b>.</span></div>
+      }
+      <div class="sheet-actions"><button class="btn primary lg block" type="button" [disabled]="busy() || !cNewDose || cNewDose === m.current_dose" (click)="saveChange()">Nastavi</button></div>
+    </div>
+  }
+</app-sheet>
+
+<app-sheet [open]="!!stockOpen()" title="Zaliha leka" (closed)="stockOpen.set(null)">
+  <div class="stack">
+    <div class="field"><label for="s-name">Pakovanje</label><input id="s-name" class="input" [(ngModel)]="sName" /></div>
+    <div class="grid-2">
+      <div class="field"><label for="s-total">Količina leka po pakovanju ({{ med()?.dose_unit }})</label><input id="s-total" class="input num" type="number" inputmode="decimal" [(ngModel)]="sTotal" /></div>
+      <div class="field"><label for="s-qty">Broj pakovanja</label><input id="s-qty" class="input num" type="number" inputmode="numeric" min="1" [(ngModel)]="sQty" /></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label for="s-open">Otvoreno</label><input id="s-open" class="input" type="date" [(ngModel)]="sOpened" /></div>
+      <div class="field"><label for="s-exp">Rok trajanja</label><input id="s-exp" class="input" type="date" [(ngModel)]="sExpires" /></div>
+    </div>
+    <div class="field"><label for="s-thr">Podseti me kada ostane manje od (dana)</label><input id="s-thr" class="input num" type="number" min="1" [(ngModel)]="sThreshold" /></div>
+    <p class="tiny muted">Preostala količina je procena: ukupna količina minus doze zabeležene od otvaranja pakovanja.</p>
+    <div class="sheet-actions">
+      <button class="btn primary lg block" type="button" [disabled]="busy() || !sTotal" (click)="saveStock()">Sačuvaj</button>
+      @if (stockOpen()?.created_at) { <button class="btn danger-soft block" type="button" (click)="removeStock()">Ukloni praćenje zalihe</button> }
+    </div>
+  </div>
+</app-sheet>

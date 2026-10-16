@@ -2,7 +2,7 @@ import { computed, effect, inject, Injectable, signal, untracked } from '@angula
 import { AuthService } from '../auth/auth.service';
 import { DataService } from '../data/data.service';
 import { q } from '../data/query';
-import { Child } from '../models/models';
+import { Child, MedicalDocument } from '../models/models';
 import { uuid } from '../utils/uuid';
 import { FamilyService } from './family.service';
 
@@ -87,7 +87,10 @@ export class ChildService {
     return saved;
   }
 
+  /** Deletes the child; DB rows cascade, stored document files are removed explicitly. */
   async remove(id: string): Promise<void> {
+    const docs = await this.data.list<MedicalDocument>('documents', q().eq('child_id', id));
+    for (const d of docs) await this.data.removeFile(d.storage_path).catch(() => undefined);
     await this.data.remove('children', id);
     this.children.update((l) => l.filter((c) => c.id !== id));
     if (this.selectedId() === id) {

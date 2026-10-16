@@ -1,11 +1,15 @@
 import { AppEnvironment } from './environment.model';
 
-/** Production build. Values are injected at build time — see README. */
+/**
+ * Production build (Supabase project "GrowthCare").
+ * The anon key is a PUBLIC client key — data is protected by Postgres RLS.
+ * Never put the service_role key here.
+ */
 export const environment: AppEnvironment = {
   production: true,
   backend: 'supabase',
-  supabaseUrl: 'https://YOUR-PROJECT.supabase.co',
-  supabaseAnonKey: 'YOUR-PUBLIC-ANON-KEY',
-  ocrProvider: 'edge',
+  supabaseUrl: 'https://gdqgskrlmxczrjppfoko.supabase.co',
+  supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdkcWdza3JsbXhjenJqcHBmb2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODMwNzQsImV4cCI6MjEwNzc1OTA3NH0.JoFvjaRQst_h5GXDxmuYkRGDt_7Fudn9K7hii5_mxKU',
+  ocrProvider: 'browser',
   vapidPublicKey: '',
 };

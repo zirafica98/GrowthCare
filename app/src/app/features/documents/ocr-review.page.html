@@ -1,0 +1,114 @@
+<div class="page wide">
+  <app-page-header title="OCR — provera podataka" [back]="true" [backLink]="'/app/documents/' + id()" />
+
+  @if (error()) {
+    <app-error-state message="Dokument nije pronađen ili nemate pristup." kind="permission" [retryable]="false" />
+  } @else if (!doc()) {
+    <app-loading [rows]="2" [height]="200" />
+  } @else {
+    <div class="layout">
+      <div class="preview stack sm">
+        <app-document-preview [doc]="doc()!" [height]="420" />
+        <p class="tiny muted center">Original dokumenta ostaje sačuvan nepromenjen.</p>
+      </div>
+
+      <div class="stack">
+        <div class="notice warning" role="note"><app-icon name="sparkles" [size]="18" />
+          <span><b>Automatski izvučeno — proverite podatke pre čuvanja.</b> Ispravite pogrešne vrednosti i odčekirajte one koje ne želite da sačuvate.</span></div>
+        <div class="notice info small"><app-icon name="user" [size]="16" /> Dokument za: <b>{{ child()?.first_name }}</b></div>
+
+        @if (!fields().length && !labs().length) {
+          <div class="notice danger"><app-icon name="alert" [size]="18" /><span>Nismo pronašli podatke u dokumentu. Unesite naslov i datum ručno, a rezultate u Laboratoriji.</span></div>
+        }
+
+        <!-- Document metadata -->
+        <section class="card">
+          <h3 style="margin-bottom:6px">Dokument</h3>
+          <div class="field" style="margin-bottom:6px"><label for="r-cat">Kategorija</label>
+            <select id="r-cat" class="select" [(ngModel)]="category">@for (c of cats; track c[0]) { <option [value]="c[0]">{{ c[1] }}</option> }</select></div>
+          @for (f of meta(); track f.name) {
+            <div class="frow">
+              <input type="checkbox" [(ngModel)]="f.include" (ngModelChange)="touch()" [attr.aria-label]="'Sačuvaj ' + labels[f.name]" />
+              <div class="field">
+                <div class="row between"><label [for]="'f-' + f.name">{{ labels[f.name] }}</label>
+                  <span class="row" style="gap:6px">@if (f.value !== f.original) { <span class="edited">izmenjeno</span> }<span class="conf" [class]="'conf ' + f.confidence">{{ confLabel(f.confidence) }}</span></span></div>
+                <input class="input" [id]="'f-' + f.name" [type]="inputType(f.name)" [(ngModel)]="f.value" (ngModelChange)="touch()" />
+              </div>
+            </div>
+          }
+          @for (f of other(); track f.name) {
+            <div class="frow">
+              <input type="checkbox" [(ngModel)]="f.include" (ngModelChange)="touch()" [attr.aria-label]="'Sačuvaj ' + labels[f.name]" />
+              <div class="field">
+                <div class="row between"><label [for]="'f-' + f.name">{{ labels[f.name] }}</label><span class="conf" [class]="'conf ' + f.confidence">{{ confLabel(f.confidence) }}</span></div>
+                <input class="input" [id]="'f-' + f.name" [type]="inputType(f.name)" [(ngModel)]="f.value" (ngModelChange)="touch()" />
+                @if (f.name === 'diagnosis') { <span class="field-hint">Dijagnoza se čuva samo kao tekst sa dokumenta, i samo ako je čekirate.</span> }
+              </div>
+            </div>
+          }
+          @if (followUp()) {
+            <label class="check" style="margin-top:6px"><input type="checkbox" [(ngModel)]="createFollowUp" /> <span class="small">Napravi kontrolu u kalendaru za {{ followUp()!.value }} (sa podsetnicima)</span></label>
+          }
+        </section>
+
+        <!-- Lab results -->
+        @if (labs().length) {
+          <section class="card">
+            <div class="row between"><h3>Laboratorijski rezultati ({{ selectedLabs() }}/{{ labs().length }})</h3>
+              <span class="row" style="gap:4px"><button class="btn ghost sm" type="button" (click)="setAllLabs(true)">Sve</button><button class="btn ghost sm" type="button" (click)="setAllLabs(false)">Ništa</button></span></div>
+            <p class="tiny muted">Referentni opseg i oznaka prepisuju se sa nalaza; aplikacija ne tumači rezultate.</p>
+            @for (l of labs(); track $index) {
+              <div class="lab">
+                <input type="checkbox" [(ngModel)]="l.include" [attr.aria-label]="'Sačuvaj ' + l.test_name" />
+                <input class="input" [(ngModel)]="l.test_name" aria-label="Analiza" />
+                <input class="input num" [(ngModel)]="l.result_value" aria-label="Vrednost" />
+                <div class="sub">
+                  <input class="input" [(ngModel)]="l.unit" placeholder="Jedinica" aria-label="Jedinica" />
+                  <input class="input" [(ngModel)]="l.reference_range" placeholder="Ref. opseg" aria-label="Referentni opseg" />
+                  <span class="conf" [class]="'conf ' + l.confidence" style="text-align:center">{{ l.confidence === 'high' ? 'visoka' : l.confidence === 'medium' ? 'srednja' : 'niska' }}</span>
+                </div>
+              </div>
+            }
+            <label class="check" style="margin-top:8px"><input type="checkbox" [(ngModel)]="saveLabs" /> <span class="small">Sačuvaj čekirane rezultate u Laboratoriju</span></label>
+          </section>
+        }
+
+        <!-- Growth -->
+        @if (growth().length) {
+          <section class="card">
+            <h3>Merenje</h3>
+            <div class="grid-2" style="margin-top:8px">
+              @for (f of growth(); track f.name) {
+                <div class="field">
+                  <div class="row between"><label [for]="'f-' + f.name">{{ labels[f.name] }}</label><span class="conf" [class]="'conf ' + f.confidence">{{ f.confidence === 'high' ? 'visoka' : f.confidence === 'medium' ? 'srednja' : 'niska' }}</span></div>
+                  <input class="input num" [id]="'f-' + f.name" inputmode="decimal" [(ngModel)]="f.value" (ngModelChange)="touch()" />
+                </div>
+              }
+            </div>
+            <label class="check" style="margin-top:8px"><input type="checkbox" [(ngModel)]="saveMeasurement" /> <span class="small">Dodaj kao merenje rasta (izvor: dokument)</span></label>
+          </section>
+        }
+
+        <!-- Therapy (informational; changes go through the explicit therapy flow) -->
+        @if (therapy().length) {
+          <section class="card stack sm">
+            <h3>Terapija na dokumentu</h3>
+            @for (f of therapy(); track f.name) {
+              <div class="field">
+                <div class="row between"><label [for]="'f-' + f.name">{{ labels[f.name] }}</label><span class="conf" [class]="'conf ' + f.confidence">{{ confLabel(f.confidence) }}</span></div>
+                <input class="input" [id]="'f-' + f.name" [type]="inputType(f.name)" [(ngModel)]="f.value" (ngModelChange)="touch()" />
+              </div>
+            }
+            <p class="tiny muted">Terapija se ne menja automatski. Ako je lekar propisao novu dozu, zabeležite je kroz „Promena doze” uz potvrdu.</p>
+            @if (field('dose')?.value) { <button class="btn outline primary-text" type="button" (click)="recordTherapy()"><app-icon name="pill" [size]="18" /> Zabeleži promenu terapije…</button> }
+          </section>
+        }
+
+        <div class="row" style="justify-content:flex-end; gap:10px; position:sticky; bottom:calc(var(--nav-h) + var(--safe-bottom) + 8px); background:var(--bg); padding:8px 0">
+          <button class="btn outline" type="button" (click)="cancel()">Poništi</button>
+          <button class="btn primary lg" type="button" [disabled]="busy()" (click)="confirm()"><app-icon name="check" /> Potvrdi podatke</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>
