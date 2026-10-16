@@ -1,0 +1,42 @@
+import { Routes } from '@angular/router';
+import { authGuard, guestGuard, sessionGuard } from './core/auth/guards';
+
+export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'app' },
+  { path: 'login', canActivate: [guestGuard], loadComponent: () => import('./features/auth/login.page').then((m) => m.LoginPage), title: 'Prijava — GrowthCare' },
+  { path: 'register', canActivate: [guestGuard], loadComponent: () => import('./features/auth/register.page').then((m) => m.RegisterPage), title: 'Kreiraj nalog — GrowthCare' },
+  { path: 'forgot-password', loadComponent: () => import('./features/auth/forgot-password.page').then((m) => m.ForgotPasswordPage), title: 'Zaboravljena lozinka — GrowthCare' },
+  { path: 'reset-password', loadComponent: () => import('./features/auth/reset-password.page').then((m) => m.ResetPasswordPage), title: 'Nova lozinka — GrowthCare' },
+  { path: 'invite/:token', loadComponent: () => import('./features/family/invite-accept.page').then((m) => m.InviteAcceptPage), title: 'Pozivnica — GrowthCare' },
+  { path: 'setup', canActivate: [sessionGuard], loadComponent: () => import('./features/setup/setup.page').then((m) => m.SetupPage), title: 'Podešavanje porodice — GrowthCare' },
+  {
+    path: 'app',
+    canActivate: [authGuard],
+    loadComponent: () => import('./layouts/app-layout.component').then((m) => m.AppLayoutComponent),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.page').then((m) => m.DashboardPage), title: 'Početna — GrowthCare' },
+      { path: 'history', loadComponent: () => import('./features/history/history.page').then((m) => m.HistoryPage), title: 'Istorija doza — GrowthCare' },
+      { path: 'growth', loadComponent: () => import('./features/growth/growth.page').then((m) => m.GrowthPage), title: 'Rast i razvoj — GrowthCare' },
+      { path: 'therapy', loadComponent: () => import('./features/therapy/therapy.page').then((m) => m.TherapyPage), title: 'Terapija — GrowthCare' },
+      { path: 'doctors', loadComponent: () => import('./features/doctors/visits.page').then((m) => m.VisitsPage), title: 'Kontrole i pregledi — GrowthCare' },
+      { path: 'doctors/:id', loadComponent: () => import('./features/doctors/visit-detail.page').then((m) => m.VisitDetailPage), title: 'Kontrola — GrowthCare' },
+      { path: 'laboratory', loadComponent: () => import('./features/laboratory/laboratory.page').then((m) => m.LaboratoryPage), title: 'Laboratorija — GrowthCare' },
+      { path: 'documents', loadComponent: () => import('./features/documents/documents.page').then((m) => m.DocumentsPage), title: 'Dokumenti — GrowthCare' },
+      { path: 'documents/:id', loadComponent: () => import('./features/documents/document-detail.page').then((m) => m.DocumentDetailPage), title: 'Dokument — GrowthCare' },
+      { path: 'documents/:id/review', loadComponent: () => import('./features/documents/ocr-review.page').then((m) => m.OcrReviewPage), title: 'Provera podataka — GrowthCare' },
+      { path: 'calendar', loadComponent: () => import('./features/calendar/calendar.page').then((m) => m.CalendarPage), title: 'Kalendar — GrowthCare' },
+      { path: 'reminders', loadComponent: () => import('./features/reminders/reminders.page').then((m) => m.RemindersPage), title: 'Podsetnici — GrowthCare' },
+      { path: 'notifications', loadComponent: () => import('./features/notifications/notifications.page').then((m) => m.NotificationsPage), title: 'Obaveštenja — GrowthCare' },
+      { path: 'timeline', loadComponent: () => import('./features/timeline/timeline.page').then((m) => m.TimelinePage), title: 'Hronologija — GrowthCare' },
+      { path: 'search', loadComponent: () => import('./features/timeline/search.page').then((m) => m.SearchPage), title: 'Pretraga — GrowthCare' },
+      { path: 'family', loadComponent: () => import('./features/family/family.page').then((m) => m.FamilyPage), title: 'Porodica — GrowthCare' },
+      { path: 'children/new', loadComponent: () => import('./features/children/child-form.page').then((m) => m.ChildFormPage), title: 'Novo dete — GrowthCare' },
+      { path: 'children/:id', loadComponent: () => import('./features/children/child-profile.page').then((m) => m.ChildProfilePage), title: 'Profil deteta — GrowthCare' },
+      { path: 'settings', loadComponent: () => import('./features/settings/settings.page').then((m) => m.SettingsPage), title: 'Podešavanja — GrowthCare' },
+      { path: 'audit', loadComponent: () => import('./features/settings/audit.page').then((m) => m.AuditPage), title: 'Istorija izmena — GrowthCare' },
+      { path: 'more', loadComponent: () => import('./features/more/more.page').then((m) => m.MorePage), title: 'Više — GrowthCare' },
+    ],
+  },
+  { path: '**', redirectTo: 'app' },
+];

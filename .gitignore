@@ -1,0 +1,14 @@
+# Real medical documents — NEVER commit (contain personal health data)
+scan/
+
+.DS_Store
+node_modules/
+dist/
+.angular/
+coverage/
+*.log
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/

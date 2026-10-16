@@ -1,0 +1,168 @@
+<div class="page">
+  @if (!children.selected() && children.loaded()) {
+    <app-empty-state title="Dodajte prvo dete" text="Svi podaci u aplikaciji vezani su za izabrano dete." image="illustrations/boy-backpack.png">
+      <a class="btn primary" routerLink="/app/children/new">Dodaj dete</a>
+    </app-empty-state>
+  } @else if (snap.error()) {
+    <app-error-state [message]="snap.error()!.message" [kind]="snap.error()!.kind === 'permission' ? 'permission' : 'error'" (retry)="snap.reload()" />
+  } @else if (snap.loading()) {
+    <app-loading [rows]="1" [height]="190" />
+    <div style="height:12px"></div>
+    <app-loading [rows]="3" [height]="80" />
+  } @else {
+    <!-- TODAY -->
+    <section aria-labelledby="today-h">
+      <div class="section-title" style="margin-top:4px">
+        <h2 id="today-h">Danas</h2>
+        @if (week(); as w) {
+          @if (w.expected) {
+            <span class="badge" [class.success]="w.adherence === 100">Ova nedelja: {{ w.given }}/{{ w.expected - w.pending }} doza</span>
+          }
+        }
+      </div>
+
+      @for (s of today(); track s.medication.id) {
+        <article class="dose-card" [class]="'dose-card ' + s.status">
+          <div class="dc-head">
+            <div class="icon-tile" [class.success]="s.status === 'given'" [class.warning]="s.status === 'skipped'">
+              <app-icon name="syringe" />
+            </div>
+            <div class="grow">
+              <div class="dc-med">{{ s.medication.name }}</div>
+              <div class="dc-dose num">{{ fmt(s.medication.current_dose, 3) }} {{ s.medication.dose_unit }} · <span class="muted">{{ time(s.scheduledFor) }}</span></div>
+            </div>
+            <app-status-badge [status]="s.status" />
+          </div>
+
+          @switch (s.status) {
+            @case ('given') {
+              <div class="dc-state given">
+                <app-icon name="check-circle" [size]="30" />
+                <div class="grow">
+                  <b>Doza je data</b>
+                  <div class="small">u {{ time(s.record!.administered_at) }} · {{ family.memberName(s.record!.administered_by) }}{{ s.record!.injection_site ? ' · ' + s.record!.injection_site : '' }}</div>
+                </div>
+                <button class="btn sm ghost" type="button" (click)="open(s)">Izmeni</button>
+              </div>
+            }
+            @case ('skipped') {
+              <div class="dc-state skipped">
+                <app-icon name="x-circle" [size]="30" />
+                <div class="grow"><b>Nije dato</b><div class="small">{{ s.record!.skip_reason }}</div></div>
+                <button class="btn sm ghost" type="button" (click)="open(s)">Izmeni</button>
+              </div>
+            }
+            @default {
+              <div class="dc-actions">
+                <button class="btn primary lg grow" type="button" (click)="open(s)"><app-icon name="check" /> Evidentiraj dozu</button>
+                <button class="btn outline lg" type="button" (click)="open(s, 'skip')">Nije dato</button>
+              </div>
+            }
+          }
+        </article>
+      } @empty {
+        <div class="card soft">
+          @if (activeMed()) {
+            <div class="row"><app-icon name="sun" /><span>Danas nema zakazane doze za {{ children.selected()?.first_name }}.</span></div>
+          } @else {
+            <div class="row top">
+              <img src="illustrations/f-injection.png" alt="" width="72" height="68" style="border-radius:14px" />
+              <div class="stack sm grow">
+                <b>Nema unete terapije</b>
+                <span class="small muted">Dodajte terapiju koju je propisao lekar da biste beležili doze.</span>
+                <a class="btn primary sm" routerLink="/app/therapy" style="align-self:flex-start">Dodaj terapiju</a>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- ATTENTION -->
+    @if (attention().length) {
+      <section class="stack sm" style="margin-top:14px" aria-label="Potrebna pažnja">
+        @for (a of attention(); track a.text) {
+          <a class="notice" [class]="'notice ' + a.tone" [routerLink]="a.link"><app-icon [name]="a.icon" [size]="18" /><span class="grow">{{ a.text }}</span><app-icon name="chevron-right" [size]="16" /></a>
+        }
+      </section>
+    }
+
+    <!-- METRICS -->
+    <section class="metrics card" aria-label="Rast i terapija">
+      <a routerLink="/app/growth" class="m"><app-metric-card label="Visina" [value]="growth().height ? fmt(growth().height!.value) + ' cm' : ''" [hint]="growth().heightHint" [trend]="growth().heightHint ? 'up' : 'none'" /></a>
+      <a routerLink="/app/growth" class="m"><app-metric-card label="Težina" [value]="growth().weight ? fmt(growth().weight!.value) + ' kg' : ''" [hint]="growth().weightHint" [trend]="growth().weightHint ? 'up' : 'none'" /></a>
+      <a routerLink="/app/therapy" class="m"><app-metric-card label="Terapija" [value]="activeMed() ? fmt(activeMed()!.current_dose, 3) + ' ' + activeMed()!.dose_unit : ''" [hint]="activeMed() ? activeMed()!.name : 'Nije uneta'" /></a>
+    </section>
+
+    <!-- NEXT VISIT -->
+    <div class="section-title"><h3>Sledeće</h3><a routerLink="/app/calendar">Kalendar</a></div>
+    <div class="stack sm">
+      @if (nextVisit(); as v) {
+        <a class="card link row" [routerLink]="['/app/doctors', v.id]">
+          <div class="icon-tile violet"><app-icon name="stethoscope" /></div>
+          <div class="grow">
+            <div class="small muted">Sledeća kontrola · {{ rel(v.scheduled_at) }}</div>
+            <b>{{ fmtDateTime(v.scheduled_at) }}</b>
+            <div class="small muted">{{ visits.label(v) }}</div>
+          </div>
+          <app-icon name="chevron-right" [size]="18" />
+        </a>
+      } @else {
+        <a class="card link row" routerLink="/app/doctors">
+          <div class="icon-tile violet"><app-icon name="stethoscope" /></div>
+          <span class="grow muted">Nema zakazane kontrole</span>
+          <span class="badge info"><app-icon name="plus" [size]="14" /> Dodaj</span>
+        </a>
+      }
+      @for (u of upcoming(); track u.r.id) {
+        <a class="card link row tight" routerLink="/app/reminders">
+          <div class="icon-tile sm" [class.warning]="u.r.type === 'stock'" [class.success]="u.r.type === 'measurement'"><app-icon [name]="u.r.type === 'laboratory' ? 'flask' : u.r.type === 'measurement' ? 'ruler' : u.r.type === 'stock' ? 'package' : 'bell'" [size]="18" /></div>
+          <div class="grow"><b class="small">{{ u.r.title }}</b><div class="tiny muted">{{ fmtDateTime(u.at.toISOString()) }}</div></div>
+        </a>
+      }
+    </div>
+
+    <!-- GROWTH MINI CHART -->
+    @if (growth().heights.length > 1) {
+      <div class="section-title"><h3>Rast</h3><a routerLink="/app/growth">Detalji</a></div>
+      <a class="card link" routerLink="/app/growth" style="display:block">
+        <div class="card-title">Visina (cm)</div>
+        <app-line-chart [points]="growth().heights" unit="cm" label="Visina" [height]="150" />
+      </a>
+    }
+
+    <!-- THERAPY -->
+    @if (activeMed(); as m) {
+      <div class="section-title"><h3>Terapija</h3><a routerLink="/app/therapy">Detalji</a></div>
+      <a class="card link row" routerLink="/app/therapy">
+        <div class="icon-tile"><app-icon name="pill" /></div>
+        <div class="grow">
+          <b>{{ m.name }}</b>
+          <div class="small muted">Zabeležena doza: {{ fmt(m.current_dose, 3) }} {{ m.dose_unit }} · {{ m.scheduled_time }}</div>
+          @if (lastChange(); as c) { <div class="tiny muted">Promena {{ fmtDate(c.changed_at) }}: {{ fmt(c.previous_dose, 3) }} → {{ fmt(c.new_dose, 3) }} {{ c.dose_unit }}</div> }
+        </div>
+      </a>
+    }
+
+    <!-- RECENT -->
+    <div class="section-title"><h3>Poslednje aktivnosti</h3><a routerLink="/app/timeline">Sve</a></div>
+    <div class="card">
+      @for (e of recent(); track e.id) {
+        <a class="list-item" [routerLink]="e.link">
+          <div class="icon-tile sm" [class.success]="e.type === 'injection'" [class.warning]="e.type === 'skipped'" [class.violet]="e.type === 'visit'">
+            <app-icon [name]="e.type === 'injection' || e.type === 'skipped' ? 'syringe' : e.type === 'measurement' ? 'ruler' : e.type === 'lab' ? 'flask' : e.type === 'document' ? 'file' : e.type === 'visit' ? 'stethoscope' : 'pill'" [size]="18" />
+          </div>
+          <div class="grow">
+            <div class="small strong ellipsis">{{ e.title }}</div>
+            <div class="tiny muted ellipsis">{{ e.subtitle }}</div>
+          </div>
+          <span class="tiny subtle nowrap">{{ rel(e.date) }}</span>
+        </a>
+      } @empty {
+        <p class="muted small">Još nema aktivnosti.</p>
+      }
+    </div>
+  }
+</div>
+
+<app-dose-sheet [slot]="sheetSlot()" [startMode]="sheetMode()" (done)="onSheetDone($event)" />
