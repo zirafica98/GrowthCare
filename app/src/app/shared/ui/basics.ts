@@ -42,18 +42,28 @@ export class LogoComponent {
   readonly stacked = input(false);
 }
 
-/** Child avatar: initials on the child's colour (photos optional, not stored by default). */
+export const CHILD_PORTRAITS = ['boy-1', 'boy-2', 'boy-3', 'girl-1'];
+
+/** Child avatar: illustrated portrait from the design, or initials on the child's colour. */
 @Component({
   selector: 'app-child-avatar',
   template: `<span class="av" [style.width.px]="size()" [style.height.px]="size()" [style.background]="child()?.avatar_color || '#DCEBFF'"
-    [style.font-size.px]="size() * 0.42" aria-hidden="true">{{ initials() }}</span>`,
-  styles: [`.av { display: inline-grid; place-items: center; border-radius: 50%; font-weight: 700; color: #24406f; flex: 0 0 auto; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(28,39,64,.12); }`],
+    [style.font-size.px]="size() * 0.42" aria-hidden="true">
+    @if (portrait(); as src) { <img [src]="src" alt="" /> } @else { {{ initials() }} }
+  </span>`,
+  styles: [`.av { display: inline-grid; place-items: center; border-radius: 50%; font-weight: 700; color: #24406f; flex: 0 0 auto; border: 2px solid var(--card); box-shadow: 0 1px 4px rgba(28,39,64,.12); overflow: hidden; }
+    .av img { width: 100%; height: 100%; object-fit: cover; }`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChildAvatarComponent {
   readonly child = input<Child | null>(null);
   readonly size = input(40);
   readonly initials = computed(() => (this.child()?.first_name ?? '?').slice(0, 1).toUpperCase());
+  /** Illustrated portraits from the design ("ill:<key>" in photo_url). */
+  readonly portrait = computed(() => {
+    const p = this.child()?.photo_url;
+    return p?.startsWith('ill:') && CHILD_PORTRAITS.includes(p.slice(4)) ? `illustrations/avatars/${p.slice(4)}.png` : null;
+  });
 }
 
 /** Status shown with icon + text, never colour alone. */
@@ -200,4 +210,35 @@ export class MetricCardComponent {
   readonly icon = input<string>('');
   readonly tone = input<string>('');
   readonly trend = input<'up' | 'none'>('none');
+}
+
+/** Progress ring from the design ("5/7 Doze (nedeljno)"). Descriptive count only. */
+@Component({
+  selector: 'app-ring',
+  template: `
+    <span class="ring" role="img" [attr.aria-label]="value() + ' od ' + total() + ' ' + label()">
+      <svg [attr.width]="size()" [attr.height]="size()" viewBox="0 0 36 36" aria-hidden="true">
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--surface-2)" stroke-width="4" />
+        <circle cx="18" cy="18" r="15.5" fill="none" stroke="var(--success-accent)" stroke-width="4" stroke-linecap="round"
+          [attr.stroke-dasharray]="dash()" transform="rotate(-90 18 18)" />
+      </svg>
+      <span class="txt"><b class="num">{{ value() }}/{{ total() }}</b><span>{{ label() }}</span></span>
+    </span>`,
+  styles: [`
+    .ring { display: inline-flex; align-items: center; gap: 8px; }
+    .txt { display: flex; flex-direction: column; line-height: 1.1; }
+    .txt b { font-size: 15px; } .txt span { font-size: 11.5px; color: var(--text-2); }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class RingComponent {
+  readonly value = input(0);
+  readonly total = input(0);
+  readonly label = input('');
+  readonly size = input(40);
+  readonly dash = computed(() => {
+    const c = 2 * Math.PI * 15.5;
+    const f = this.total() ? Math.min(1, this.value() / this.total()) : 0;
+    return `${(c * f).toFixed(1)} ${c.toFixed(1)}`;
+  });
 }

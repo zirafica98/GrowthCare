@@ -15,6 +15,7 @@ import { LogoComponent } from '../../shared/ui/basics';
           <app-logo [size]="64" [stacked]="true" />
           <p class="tagline">Praćenje terapije i rasta deteta</p>
         </div>
+        <img class="mobile-hero" src="illustrations/hero-landscape.png" alt="" width="310" height="285" />
         <div class="card form-card">
           @if (title()) { <h2>{{ title() }}</h2> }
           <ng-content />
@@ -31,9 +32,12 @@ import { LogoComponent } from '../../shared/ui/basics';
     .form-card { width: min(420px, 100%); padding: 22px; border-radius: 24px; display: flex; flex-direction: column; gap: 14px; }
     .form-card h2 { font-size: 20px; }
     .foot { max-width: 360px; }
+    .mobile-hero { width: min(420px, 100%); height: 170px; object-fit: cover; object-position: 30% 12%; border-radius: 24px; margin-bottom: -40px; box-shadow: var(--shadow); }
+    .form-card { position: relative; }
     @media (min-width: 900px) {
       .auth { grid-template-columns: 1.05fr 1fr; }
       .hero { display: block; position: relative; overflow: hidden; }
+      .mobile-hero { display: none; }
       .hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 30% 60%; }
     }
   `],

@@ -27,8 +27,18 @@ import { VisitFormComponent } from './visit-form.component';
       } @else if (data.loading()) {
         <app-loading [rows]="3" [height]="76" />
       } @else {
+        @if (tab() === 'upcoming' && list()[0]; as next) {
+          <a class="card next row" [routerLink]="['/app/doctors', next.id]">
+            <img src="illustrations/doctor.png" alt="" width="70" height="92" />
+            <div class="grow">
+              <div class="small muted">Sledeća kontrola · {{ rel(next.scheduled_at) }}</div>
+              <b>{{ fmt(next.scheduled_at) }}</b>
+              <div class="small muted">{{ visits.label(next) }}{{ doctor(next.doctor_id) ? ' · ' + doctor(next.doctor_id) : '' }}</div>
+            </div>
+          </a>
+        }
         <div class="stack sm">
-          @for (v of list(); track v.id) {
+          @for (v of (tab() === 'upcoming' ? list().slice(1) : list()); track v.id) {
             <a class="card link row" [routerLink]="['/app/doctors', v.id]">
               <div class="icon-tile" [class.violet]="v.status === 'scheduled'" [class.success]="v.status === 'completed'"><app-icon [name]="icon(v)" /></div>
               <div class="grow">
@@ -40,7 +50,7 @@ import { VisitFormComponent } from './visit-form.component';
               @if (withReminders().has(v.id)) { <app-icon name="bell" [size]="18" /> }
             </a>
           } @empty {
-            <app-empty-state [title]="tab() === 'upcoming' ? 'Nema zakazanih kontrola' : 'Nema prethodnih kontrola'" image="illustrations/f-visit.png" />
+            @if (!list().length) { <app-empty-state [title]="tab() === 'upcoming' ? 'Nema zakazanih kontrola' : 'Nema prethodnih kontrola'" image="illustrations/f-visit.png" /> }
           }
         </div>
         <button class="btn outline primary-text block" type="button" style="margin-top:14px" (click)="formOpen.set(true)"><app-icon name="plus" [size]="18" /> Dodaj kontrolu</button>
@@ -49,6 +59,7 @@ import { VisitFormComponent } from './visit-form.component';
     <app-sheet [open]="formOpen()" title="Nova kontrola" (closed)="formOpen.set(false)">
       @if (formOpen()) { <app-visit-form (saved)="formOpen.set(false)" /> }
     </app-sheet>`,
+  styles: [`.next { margin-bottom: 12px; background: linear-gradient(135deg, var(--violet-soft), var(--card)); text-decoration: none !important; color: inherit; } .next img { width: 64px; height: auto; border-radius: 14px; }`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class VisitsPage {

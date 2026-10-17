@@ -13,14 +13,14 @@ import { doseStats, DoseSlot, expectedSlots } from '../../core/utils/dose-schedu
 import { changeOver, formatSigned, series } from '../../core/utils/growth';
 import { nextOccurrence } from '../../core/utils/recurrence';
 import { childData } from '../../shared/child-data';
-import { EmptyStateComponent, ErrorStateComponent, LoadingSkeletonComponent, MetricCardComponent, StatusBadgeComponent } from '../../shared/ui/basics';
+import { EmptyStateComponent, ErrorStateComponent, LoadingSkeletonComponent, MetricCardComponent, RingComponent, StatusBadgeComponent } from '../../shared/ui/basics';
 import { IconComponent } from '../../shared/ui/icon.component';
 import { LineChartComponent } from '../../shared/ui/line-chart.component';
 import { DoseSheetComponent } from '../doses/dose-sheet.component';
 
 @Component({
   selector: 'app-dashboard-page',
-  imports: [RouterLink, IconComponent, MetricCardComponent, StatusBadgeComponent, EmptyStateComponent, LoadingSkeletonComponent, ErrorStateComponent, LineChartComponent, DoseSheetComponent],
+  imports: [RouterLink, IconComponent, RingComponent, MetricCardComponent, StatusBadgeComponent, EmptyStateComponent, LoadingSkeletonComponent, ErrorStateComponent, LineChartComponent, DoseSheetComponent],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

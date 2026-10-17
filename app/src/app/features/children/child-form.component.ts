@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject, input, OnInit, output } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Child, Sex } from '../../core/models/models';
+import { CHILD_PORTRAITS } from '../../shared/ui/basics';
 import { AVATAR_COLORS } from '../../core/services/child.service';
 import { toLocalDate } from '../../core/utils/dates';
 
@@ -10,6 +11,7 @@ export interface ChildFormValue {
   date_of_birth: string;
   sex: Sex;
   avatar_color: string;
+  photo_url: string | null;
   birth_weight_g: number | null;
   birth_length_cm: number | null;
 }
@@ -42,7 +44,18 @@ export interface ChildFormValue {
         </div>
       </div>
       <div class="field">
-        <span class="label">Boja avatara</span>
+        <span class="label">Avatar</span>
+        <div class="chips">
+          @for (p of portraits; track p) {
+            <button type="button" class="portrait" [attr.aria-pressed]="form.controls.photo_url.value === 'ill:' + p" [attr.aria-label]="'Ilustracija ' + ($index + 1)"
+              (click)="form.controls.photo_url.setValue('ill:' + p)"><img [src]="'illustrations/avatars/' + p + '.png'" alt="" /></button>
+          }
+          <button type="button" class="portrait initial" [attr.aria-pressed]="!form.controls.photo_url.value" aria-label="Inicijal" (click)="form.controls.photo_url.setValue(null)">
+            {{ (form.controls.first_name.value || 'A').slice(0, 1).toUpperCase() }}</button>
+        </div>
+      </div>
+      <div class="field">
+        <span class="label">Boja pozadine</span>
         <div class="chips">
           @for (c of colors; track c) {
             <button type="button" class="swatch" [style.background]="c" [attr.aria-pressed]="form.controls.avatar_color.value === c"
@@ -62,7 +75,10 @@ export interface ChildFormValue {
         <button class="btn primary" type="submit" [disabled]="busy()">{{ submitLabel() }}</button>
       </div>
     </form>`,
-  styles: [`.swatch { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border-strong); cursor: pointer; }
+  styles: [`.portrait { width: 52px; height: 52px; border-radius: 50%; padding: 0; overflow: hidden; border: 2px solid var(--card); box-shadow: 0 0 0 1px var(--border-strong); cursor: pointer; background: var(--surface-2); font-weight: 700; color: var(--text-2); font-size: 20px; }
+    .portrait img { width: 100%; height: 100%; object-fit: cover; }
+    .portrait[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--primary); }
+    .swatch { width: 38px; height: 38px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px var(--border-strong); cursor: pointer; }
     .swatch[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--primary); }`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -72,6 +88,7 @@ export class ChildFormComponent implements OnInit {
   readonly busy = input(false);
   readonly saved = output<ChildFormValue>();
   readonly colors = AVATAR_COLORS;
+  readonly portraits = CHILD_PORTRAITS;
   readonly today = toLocalDate(new Date());
 
   readonly form = inject(FormBuilder).group({
@@ -80,6 +97,7 @@ export class ChildFormComponent implements OnInit {
     date_of_birth: ['', Validators.required],
     sex: [null as Sex],
     avatar_color: [AVATAR_COLORS[0]],
+    photo_url: [null as string | null],
     birth_weight_g: [null as number | null],
     birth_length_cm: [null as number | null],
   });
@@ -95,7 +113,7 @@ export class ChildFormComponent implements OnInit {
     const v = this.form.getRawValue();
     this.saved.emit({
       first_name: v.first_name!.trim(), last_name: v.last_name?.trim() || null, date_of_birth: v.date_of_birth!, sex: v.sex ?? null,
-      avatar_color: v.avatar_color ?? AVATAR_COLORS[0], birth_weight_g: v.birth_weight_g ?? null, birth_length_cm: v.birth_length_cm ?? null,
+      avatar_color: v.avatar_color ?? AVATAR_COLORS[0], photo_url: v.photo_url ?? null, birth_weight_g: v.birth_weight_g ?? null, birth_length_cm: v.birth_length_cm ?? null,
     });
   }
 }

@@ -43,13 +43,13 @@ export async function seedDemo(db: LocalDb, auth: LocalAuthBackend): Promise<voi
   members.forEach((m) => put('family_members', m));
 
   const dobFrom = (years: number, months: number) => toLocalDate(addDays(addMonths(today, -(years * 12 + months)), -3));
-  const child = (first: string, years: number, months: number, sex: 'male' | 'female', color: string): Child => ({
-    id: uuid(), family_id: fam.id, first_name: first, last_name: 'Marković', date_of_birth: dobFrom(years, months), sex, photo_url: null,
+  const child = (first: string, years: number, months: number, sex: 'male' | 'female', color: string, portrait: string): Child => ({
+    id: uuid(), family_id: fam.id, first_name: first, last_name: 'Marković', date_of_birth: dobFrom(years, months), sex, photo_url: `ill:${portrait}`,
     avatar_color: color, birth_weight_g: 3200, birth_length_cm: 51, notes: null, created_at: nowIso, updated_at: nowIso,
   });
-  const luka = child('Luka', 8, 4, 'male', '#DCEBFF');
-  const ana = child('Ana', 5, 2, 'female', '#FDE7EF');
-  const marko = child('Marko', 2, 8, 'male', '#E3F6EC');
+  const luka = child('Luka', 8, 4, 'male', '#DCEBFF', 'boy-1');
+  const ana = child('Ana', 5, 2, 'female', '#FDE7EF', 'girl-1');
+  const marko = child('Marko', 2, 8, 'male', '#E3F6EC', 'boy-2');
   [luka, ana, marko].forEach((c) => put('children', c));
 
   const doctors: Doctor[] = [

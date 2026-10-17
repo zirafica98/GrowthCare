@@ -69,7 +69,7 @@ export class ChildService {
     const now = new Date().toISOString();
     const row: Child = {
       id: uuid(), family_id: fam.id, first_name: input.first_name.trim(), last_name: input.last_name?.trim() || null,
-      date_of_birth: input.date_of_birth, sex: input.sex ?? null, photo_url: null,
+      date_of_birth: input.date_of_birth, sex: input.sex ?? null, photo_url: input.photo_url ?? null,
       avatar_color: input.avatar_color ?? AVATAR_COLORS[this.children().length % AVATAR_COLORS.length],
       birth_weight_g: input.birth_weight_g ?? null, birth_length_cm: input.birth_length_cm ?? null,
       notes: input.notes ?? null, created_at: now, updated_at: now,

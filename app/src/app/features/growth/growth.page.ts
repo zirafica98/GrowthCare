@@ -49,15 +49,16 @@ const SOURCES: { v: MeasurementSource; l: string }[] = [
 
         <section class="card" style="margin-top:12px">
           <div class="row between top">
+            <img class="hero-ill" [src]="metricIllustration()" alt="" width="76" height="76" />
             <div>
               <div class="small muted">{{ current().label }} — poslednje merenje</div>
               <div class="hero num">{{ latest() ? fmt(latest()!.value) : '—' }} <small>{{ current().unit }}</small></div>
               @if (latest()) { <div class="tiny muted">{{ fmtDate(latest()!.date) }}</div> }
             </div>
-            @if (change(); as c) {
-              <span class="badge" [class.success]="c.delta > 0">{{ signed(c.delta, current().unit) }} · {{ c.days }} dana</span>
-            }
           </div>
+          @if (change(); as c) {
+            <p class="small" style="margin:6px 0 0"><span class="badge" [class.success]="c.delta > 0">{{ signed(c.delta, current().unit) }}</span> <span class="muted">od prethodnog merenja ({{ c.days }} dana)</span></p>
+          }
           <app-line-chart [points]="points()" [unit]="current().unit" [color]="current().color" [label]="current().label" [height]="230" />
         </section>
 
@@ -94,6 +95,7 @@ const SOURCES: { v: MeasurementSource; l: string }[] = [
 
     <app-sheet [open]="formOpen()" [title]="editing() ? 'Izmeni merenje' : 'Novo merenje'" (closed)="formOpen.set(false)">
       <form [formGroup]="form" (ngSubmit)="save()" class="stack" novalidate>
+        <img src="illustrations/measuring.png" alt="" class="form-ill" width="238" height="188" />
         <div class="summary small"><app-icon name="user" [size]="16" /> {{ children.selected()?.first_name }}</div>
         <div class="grid-2">
           <div class="field"><label for="g-d">Datum</label><input id="g-d" class="input" type="date" formControlName="date" [max]="today" /></div>
@@ -118,6 +120,8 @@ const SOURCES: { v: MeasurementSource; l: string }[] = [
   styles: [`
     .hero { font-size: 30px; font-weight: 750; letter-spacing: -0.02em; }
     .hero small { font-size: 15px; color: var(--text-2); font-weight: 600; }
+    .hero-ill { order: 2; width: 72px; height: 72px; object-fit: cover; border-radius: 18px; }
+    .form-ill { width: 100%; max-height: 130px; object-fit: cover; object-position: center 35%; border-radius: 18px; }
     .summary { display: flex; gap: 6px; align-items: center; padding: 8px 12px; background: var(--primary-softer); border-radius: 12px; font-weight: 600; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -145,6 +149,7 @@ export class GrowthPage {
 
   readonly availableMetrics = computed(() => METRICS.filter((m) => m.key !== 'head_circumference_cm' || (this.data.value() ?? []).some((x) => x.head_circumference_cm != null)));
   readonly current = computed(() => METRICS.find((m) => m.key === this.metric())!);
+  readonly metricIllustration = computed(() => ({ height_cm: 'illustrations/f-growth.png', weight_kg: 'illustrations/f-weight.png', bmi: 'illustrations/f-charts.png', head_circumference_cm: 'illustrations/strong-boy.png' })[this.metric()]);
   readonly points = computed(() => series(this.data.value() ?? [], this.metric()));
   readonly latest = computed(() => this.points().at(-1) ?? null);
   readonly change = computed(() => lastChange(this.data.value() ?? [], this.metric()));

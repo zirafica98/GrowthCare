@@ -35,3 +35,7 @@ a.card { color: inherit; text-decoration: none; }
   .dash { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 0 24px; align-items: start; }
   .dash .col > .section-title:first-child { margin-top: 4px; }
 }
+
+.ill-sm { border-radius: 16px; flex: 0 0 auto; }
+.growth-card { position: relative; }
+.growth-ill { position: absolute; right: 10px; top: 8px; width: 52px; height: auto; border-radius: 14px; opacity: .95; }

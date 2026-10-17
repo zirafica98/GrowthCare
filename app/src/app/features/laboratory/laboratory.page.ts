@@ -65,6 +65,9 @@ const COMMON_TESTS = ['IGF-1', 'IGF-BP3', 'TSH', 'FT4', 'GH', 'Glukoza', 'HbA1c'
         <div class="chips" style="margin-bottom:12px">
           @for (n of testNames(); track n) { <button type="button" class="chip" [attr.aria-pressed]="chartTest() === n" (click)="chartTest.set(n)">{{ n }}</button> }
         </div>
+        @if (!chartPoints().length || !chartTest()) {
+          <div class="row" style="margin-bottom:10px"><img src="illustrations/f-charts.png" alt="" width="64" height="64" style="border-radius:14px" /><p class="small muted grow">Izaberite analizu da vidite kako se vrednost menjala kroz vreme.</p></div>
+        }
         @if (chartPoints().length) {
           <section class="card">
             <div class="card-title">{{ chartTest() }} ({{ chartUnit() }})</div>

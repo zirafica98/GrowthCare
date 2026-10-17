@@ -66,6 +66,7 @@ export const OCR_STATUS_LABEL: Record<string, { l: string; tone: string }> = {
       <div class="stack">
         <div class="notice info small"><app-icon name="user" [size]="16" /> Dokument za: <b>{{ children.selected()?.first_name }}</b></div>
         @if (!file()) {
+          <img src="illustrations/ocr-phone.png" alt="" class="add-ill" width="168" height="140" />
           <div class="grid-3">
             <button class="pick" type="button" (click)="camera.click()"><app-icon name="camera" [size]="26" /><span>Kamera</span></button>
             <button class="pick" type="button" (click)="gallery.click()"><app-icon name="image" [size]="26" /><span>Galerija</span></button>
@@ -93,6 +94,7 @@ export const OCR_STATUS_LABEL: Record<string, { l: string; tone: string }> = {
   styles: [`
     .chips.scroll { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
     .chips.scroll .chip { flex: 0 0 auto; }
+    .add-ill { width: 100%; max-height: 120px; object-fit: cover; border-radius: 18px; }
     .pick { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 8px; border-radius: 16px; border: 1px solid var(--border-strong); background: var(--primary-softer); color: var(--primary-strong); font-weight: 600; cursor: pointer; }
   `],
   changeDetection: ChangeDetectionStrategy.OnPush,
