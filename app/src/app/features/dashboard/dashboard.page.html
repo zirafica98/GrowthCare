@@ -54,9 +54,13 @@
               </div>
             }
             @default {
+              <button class="give-btn" type="button" [disabled]="quickBusy()" (click)="quickGive(s)">
+                <app-icon name="check-circle" [size]="28" />
+                <span>{{ quickBusy() ? 'Čuvanje…' : 'Dao sam dozu' }}</span>
+              </button>
               <div class="dc-actions">
-                <button class="btn primary lg grow" type="button" (click)="open(s)"><app-icon name="check" /> Evidentiraj dozu</button>
-                <button class="btn outline lg" type="button" (click)="open(s, 'skip')">Nije dato</button>
+                <button class="btn ghost sm grow" type="button" (click)="open(s)"><app-icon name="edit" [size]="16" /> Detaljnije (mesto, napomena)</button>
+                <button class="btn outline sm" type="button" (click)="open(s, 'skip')">Nije dato</button>
               </div>
             }
           }

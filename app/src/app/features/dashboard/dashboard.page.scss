@@ -2,12 +2,21 @@
   background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow);
   padding: 16px; display: flex; flex-direction: column; gap: 14px; margin-bottom: 10px;
 }
-.dose-card.pending { border-color: var(--primary-border); background: linear-gradient(180deg, #fff 0%, var(--primary-softer) 100%); }
+.dose-card.pending { border-color: var(--primary-border); background: linear-gradient(180deg, var(--card) 0%, var(--primary-softer) 100%); }
 .dose-card.missed { border-color: var(--danger-border); }
 .dc-head { display: flex; align-items: center; gap: 12px; }
 .dc-med { font-weight: 700; font-size: 17px; }
 .dc-dose { font-size: 15px; font-weight: 600; }
-.dc-actions { display: flex; gap: 10px; }
+.dc-actions { display: flex; gap: 8px; align-items: center; }
+.give-btn {
+  display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; min-height: 68px;
+  border: 0; border-radius: 20px; cursor: pointer; font: inherit; font-size: 20px; font-weight: 750; color: #fff;
+  background: linear-gradient(180deg, #19b07a, #12805c); box-shadow: 0 10px 24px rgba(18, 128, 92, .32);
+  transition: transform .08s ease, filter .12s ease;
+}
+.give-btn:hover:not([disabled]) { filter: brightness(1.05); }
+.give-btn:active:not([disabled]) { transform: scale(.98); }
+.give-btn[disabled] { opacity: .65; cursor: progress; }
 .dc-actions .grow { flex: 1; }
 .dc-state { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 16px; }
 .dc-state.given { background: var(--success-soft); color: var(--success); }

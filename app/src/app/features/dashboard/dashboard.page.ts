@@ -5,6 +5,9 @@ import { FamilyService } from '../../core/services/family.service';
 import { TherapyService } from '../../core/services/therapy.service';
 import { TimelineService } from '../../core/services/timeline.service';
 import { VisitService } from '../../core/services/visit.service';
+import { DoseService } from '../../core/services/dose.service';
+import { ToastService } from '../../core/services/toast.service';
+import { ConfirmService } from '../../shared/ui/confirm';
 import { addDays, formatDate, formatDateTime, relativeDays, startOfDay, startOfWeek, toLocalTime } from '../../core/utils/dates';
 import { doseStats, DoseSlot, expectedSlots } from '../../core/utils/dose-schedule';
 import { changeOver, formatSigned, series } from '../../core/utils/growth';
@@ -31,6 +34,10 @@ export class DashboardPage {
 
   readonly snap = childData((id) => this.timeline.snapshot(id));
   readonly sheetSlot = signal<DoseSlot | null>(null);
+  readonly quickBusy = signal(false);
+  private readonly doses = inject(DoseService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly toast = inject(ToastService);
   readonly sheetMode = signal<'give' | 'skip'>('give');
 
   readonly fmtDate = formatDate;
@@ -118,6 +125,37 @@ export class DashboardPage {
     const s = this.snap.value();
     return s ? this.timeline.build(s).filter((e) => Date.parse(e.date) <= Date.now()).slice(0, 5) : [];
   });
+
+  /** One tap + "are you sure?" — records the prescribed dose now, by the signed-in parent. */
+  async quickGive(slot: DoseSlot): Promise<void> {
+    const child = this.children.selected();
+    if (!child || slot.medication.child_id !== child.id) return;
+    const m = slot.medication;
+    const ok = await this.confirm.ask({
+      title: 'Da li ste sigurni?',
+      message: `Beleži se da je ${child.first_name} dobio/la današnju dozu.`,
+      details: [
+        { label: 'Dete', value: child.first_name },
+        { label: 'Lek', value: m.name },
+        { label: 'Doza', value: `${this.fmt(m.current_dose, 3)} ${m.dose_unit}` },
+        { label: 'Termin', value: this.time(slot.scheduledFor) },
+        { label: 'Dato u', value: toLocalTime(new Date()) },
+      ],
+      confirmText: 'Da, dao sam',
+      cancelText: 'Ne',
+    });
+    if (!ok) return;
+    this.quickBusy.set(true);
+    try {
+      await this.doses.give(slot, { dose: m.current_dose, administeredAt: new Date(), site: null, reaction: null, note: null, administeredBy: null }, child.id);
+      this.toast.success(`Doza je zabeležena za ${child.first_name}.`);
+    } catch (e) {
+      this.toast.error(e);
+    } finally {
+      this.quickBusy.set(false);
+      void this.snap.reload();
+    }
+  }
 
   open(slot: DoseSlot, mode: 'give' | 'skip' = 'give'): void {
     this.sheetMode.set(mode);
