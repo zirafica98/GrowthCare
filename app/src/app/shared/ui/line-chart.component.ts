@@ -33,8 +33,8 @@ function niceStep(range: number, ticks: number): number {
           <line [attr.x1]="g.left" [attr.x2]="g.w - g.right" [attr.y1]="t.y" [attr.y2]="t.y" class="grid" />
           <text [attr.x]="g.left - 8" [attr.y]="t.y + 4" text-anchor="end" class="tick">{{ t.label }}</text>
         }
-        @for (t of g.xTicks; track t.x) {
-          <text [attr.x]="t.x" [attr.y]="height() - 6" text-anchor="middle" class="tick">{{ t.label }}</text>
+        @for (t of g.xTicks; track t.x; let first = $first; let last = $last) {
+          <text [attr.x]="t.x" [attr.y]="height() - 6" [attr.text-anchor]="first ? 'start' : last ? 'end' : 'middle'" class="tick">{{ t.label }}</text>
         }
         @if (g.pts.length > 1) {
           <path [attr.d]="g.area" [attr.fill]="'url(#' + gradId + ')'" />

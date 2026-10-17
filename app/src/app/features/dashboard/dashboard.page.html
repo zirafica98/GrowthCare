@@ -130,8 +130,14 @@
     @if (growth().heights.length > 1) {
       <div class="section-title"><h3>Rast</h3><a routerLink="/app/growth">Detalji</a></div>
       <a class="card link growth-card" routerLink="/app/growth" style="display:block">
-        <img class="growth-ill" src="illustrations/strong-boy.png" alt="" width="64" height="68" />
-        <div class="card-title">Visina (cm)</div>
+        <div class="gc-head">
+          <div class="grow">
+            <div class="card-title" style="margin-bottom:2px">Visina (cm)</div>
+            <b class="num gc-val">{{ fmt(growth().height!.value) }} cm</b>
+            @if (growth().heightHint) { <span class="gc-hint">{{ growth().heightHint }}</span> }
+          </div>
+          <img class="growth-ill" src="illustrations/strong-boy.png" alt="" width="56" height="60" />
+        </div>
         <app-line-chart [points]="growth().heights" unit="cm" label="Visina" [height]="150" />
       </a>
     }
