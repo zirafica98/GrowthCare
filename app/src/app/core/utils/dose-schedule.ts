@@ -31,6 +31,11 @@ export function isScheduledOn(med: Medication, day: Date): boolean {
   return f.kind === 'daily' || f.days.includes(isoWeekday(day));
 }
 
+/** Identity of a scheduled dose, independent of timestamp formatting. */
+export function slotKey(medicationId: string, scheduledFor: string): string {
+  return `${medicationId}|${Date.parse(scheduledFor)}`;
+}
+
 /** Deterministic slot timestamp → both parents' devices compute the same value (unique key). */
 export function slotFor(med: Medication, day: Date): string {
   return combineLocal(toLocalDate(day), med.scheduled_time).toISOString();
@@ -53,13 +58,14 @@ export function slotStatus(record: Injection | null, scheduledFor: string, now: 
 
 /** All expected slots in [from, to] (inclusive days) for the given medications. */
 export function expectedSlots(meds: Medication[], injections: Injection[], from: Date, to: Date, now = new Date()): DoseSlot[] {
-  const byKey = new Map(injections.map((i) => [`${i.medication_id}|${i.scheduled_for}`, i]));
+  // Compare instants, not strings: the client writes "…T21:00:00.000Z", Postgres returns "…T21:00:00+00:00".
+  const byKey = new Map(injections.map((i) => [slotKey(i.medication_id, i.scheduled_for), i]));
   const out: DoseSlot[] = [];
   for (let day = startOfDay(from); day <= to; day = addDays(day, 1)) {
     for (const m of meds) {
       if (!isScheduledOn(m, day)) continue;
       const scheduledFor = slotFor(m, day);
-      const record = byKey.get(`${m.id}|${scheduledFor}`) ?? null;
+      const record = byKey.get(slotKey(m.id, scheduledFor)) ?? null;
       out.push({ medication: m, scheduledFor, record, status: slotStatus(record, scheduledFor, now) });
     }
   }

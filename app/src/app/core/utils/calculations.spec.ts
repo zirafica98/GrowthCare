@@ -21,6 +21,15 @@ describe('dose schedule (descriptive only)', () => {
     expect(slotFor(med(), d('2026-10-16'))).toBe(combineLocal('2026-10-16', '21:30').toISOString());
   });
 
+  it('matches records whatever the timestamp format (Postgres returns +00:00, client writes Z)', () => {
+    const m = med();
+    const day = d('2026-10-30');
+    const rec = { ...given(m, day), scheduled_for: slotFor(m, day).replace('.000Z', '+00:00') };
+    const slots = expectedSlots([m], [rec], day, day, combineLocal('2026-11-01', '10:00'));
+    expect(slots[0].status).toBe('given');
+    expect(slots[0].record).toBe(rec);
+  });
+
   it('respects start/end dates and weekday schedules', () => {
     expect(isScheduledOn(med({ start_date: '2026-10-17' }), d('2026-10-16'))).toBeFalse();
     expect(isScheduledOn(med({ frequency: 'weekly:1,3,5' }), d('2026-10-19'))).toBeTrue(); // Monday

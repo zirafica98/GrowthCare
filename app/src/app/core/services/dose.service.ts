@@ -5,7 +5,7 @@ import { AppError, appError } from '../data/errors';
 import { q } from '../data/query';
 import { Injection, InjectionReaction, Medication } from '../models/models';
 import { addDays, startOfDay } from '../utils/dates';
-import { DoseSlot, expectedSlots } from '../utils/dose-schedule';
+import { DoseSlot, expectedSlots, slotKey } from '../utils/dose-schedule';
 import { uuid } from '../utils/uuid';
 import { FamilyService } from './family.service';
 
@@ -109,7 +109,7 @@ export class DoseService {
       if (err instanceof AppError && err.kind === 'conflict') {
         // The other parent already recorded this scheduled dose. Never overwrite silently.
         const existing = (await this.injections(slot.medication.child_id, new Date(slot.scheduledFor), new Date(slot.scheduledFor)))
-          .find((i) => i.medication_id === slot.medication.id && i.scheduled_for === slot.scheduledFor);
+          .find((i) => slotKey(i.medication_id, i.scheduled_for) === slotKey(slot.medication.id, slot.scheduledFor));
         const who = existing ? this.family.memberName(existing.administered_by) : 'drugi roditelj';
         throw appError('conflict', err, `Ovu dozu je već zabeležio/la ${who}.`);
       }
