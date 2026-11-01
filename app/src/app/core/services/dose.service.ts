@@ -4,7 +4,7 @@ import { DataService } from '../data/data.service';
 import { AppError, appError } from '../data/errors';
 import { q } from '../data/query';
 import { Injection, InjectionReaction, Medication } from '../models/models';
-import { addDays, startOfDay } from '../utils/dates';
+import { addDays, startOfDay, toLocalTime } from '../utils/dates';
 import { DoseSlot, expectedSlots, slotKey } from '../utils/dose-schedule';
 import { uuid } from '../utils/uuid';
 import { FamilyService } from './family.service';
@@ -110,8 +110,12 @@ export class DoseService {
         // The other parent already recorded this scheduled dose. Never overwrite silently.
         const existing = (await this.injections(slot.medication.child_id, new Date(slot.scheduledFor), new Date(slot.scheduledFor)))
           .find((i) => slotKey(i.medication_id, i.scheduled_for) === slotKey(slot.medication.id, slot.scheduledFor));
-        const who = existing ? this.family.memberName(existing.administered_by) : 'drugi roditelj';
-        throw appError('conflict', err, `Ovu dozu je već zabeležio/la ${who}.`);
+        const at = existing?.administered_at ? ` u ${toLocalTime(new Date(existing.administered_at))}` : '';
+        if (existing && existing.administered_by === this.auth.user()?.id) {
+          throw appError('conflict', err, `Ovu dozu ste već zabeležili${at}.`);
+        }
+        const who = existing?.administered_by ? this.family.memberName(existing.administered_by) : 'drugi roditelj';
+        throw appError('conflict', err, `Ovu dozu je već zabeležio/la ${who}${at}.`);
       }
       throw err;
     }
