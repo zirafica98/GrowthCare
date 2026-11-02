@@ -347,4 +347,5 @@ export type TableName =
   | 'document_extractions'
   | 'reminders'
   | 'notification_preferences'
+  | 'push_subscriptions'
   | 'audit_logs';

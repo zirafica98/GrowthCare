@@ -70,6 +70,10 @@ export class DataService {
     return this.backend.rpc<T>(fn, args).catch((e) => Promise.reject(toAppError(e)));
   }
 
+  invokeFunction<T>(name: string, body: Record<string, unknown>): Promise<T> {
+    return this.backend.invokeFunction<T>(name, body).catch((e) => Promise.reject(toAppError(e)));
+  }
+
   upload(path: string, file: Blob, contentType: string) {
     return this.backend.upload(path, file, contentType).catch((e) => Promise.reject(toAppError(e)));
   }

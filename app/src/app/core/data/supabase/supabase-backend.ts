@@ -72,6 +72,12 @@ export class SupabaseBackend extends DataBackend {
     return data as T;
   }
 
+  async invokeFunction<T>(name: string, body: Record<string, unknown>): Promise<T> {
+    const { data, error } = await this.sb.functions.invoke<T>(name, { body });
+    if (error || data == null) throw appError('unknown', error, 'Serverska funkcija nije dostupna.');
+    return data;
+  }
+
   async upload(path: string, file: Blob, contentType: string): Promise<void> {
     const { error } = await this.sb.storage.from(BUCKET).upload(path, file, { contentType, upsert: false });
     if (error && !/already exists|Duplicate/i.test(error.message)) throw appError('upload', error);

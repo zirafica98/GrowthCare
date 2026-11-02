@@ -177,6 +177,7 @@ export class AppLayoutComponent {
       });
     });
     void this.auth;
+    void this.notifications.refreshPushState().catch(() => undefined);
   }
 
   ageOf(dob: string): string {

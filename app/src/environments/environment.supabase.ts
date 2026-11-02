@@ -11,5 +11,5 @@ export const environment: AppEnvironment = {
   supabaseUrl: 'https://gdqgskrlmxczrjppfoko.supabase.co',
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdkcWdza3JsbXhjenJqcHBmb2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIxODMwNzQsImV4cCI6MjEwNzc1OTA3NH0.JoFvjaRQst_h5GXDxmuYkRGDt_7Fudn9K7hii5_mxKU',
   ocrProvider: 'browser',
-  vapidPublicKey: '',
+  vapidPublicKey: 'BBQNX8Q8gMK_GU8MGh28lq83iLaikPOxuMcJPD-rwkDi6jtecYsJhHDJRW19K3HMWm5RFrMI98vI7U4rLD5VTwM',
 };

@@ -110,7 +110,6 @@ export class NotificationService {
     const p = this.prefs() ?? (await this.loadPreferences());
     const saved = await this.data.update<NotificationPreferences>('notification_preferences', p.id, patch);
     this.prefs.set({ ...p, ...saved });
-    if (patch.push_enabled) await this.subscribePush();
   }
 
   async requestPermission(): Promise<NotificationPermission | 'unsupported'> {
@@ -149,7 +148,7 @@ export class NotificationService {
     if (!prefs) return [];
     const now = new Date();
     const plan = buildSchedule(reminders, prefs, now, addDays(now, 1), childName);
-    if (this.permission() !== 'granted') return plan;
+    if (this.permission() !== 'granted' || this.pushState() === 'on') return plan;
     for (const n of plan) {
       const delay = n.at.getTime() - Date.now();
       if (delay <= 0 || delay > 2 ** 31 - 1) continue;
@@ -171,14 +170,52 @@ export class NotificationService {
     this.timers = [];
   }
 
-  /** Web Push subscription (requires a VAPID key and the send-reminders Edge Function). */
-  private async subscribePush(): Promise<void> {
-    if (!this.swPush?.isEnabled || !environment.vapidPublicKey) return;
-    try {
-      const sub = await this.swPush.requestSubscription({ serverPublicKey: environment.vapidPublicKey });
-      await this.data.rpc('save_push_subscription', { p_subscription: sub.toJSON() });
-    } catch {
-      // Permission denied or unsupported — in-app notifications still work.
+  // ---------------------------------------------------------------- Web Push
+
+  /** iPhone/iPad only allow Web Push for apps added to the home screen (iOS 16.4+). */
+  readonly isIos = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent);
+  readonly isStandalone = typeof window !== 'undefined' &&
+    (window.matchMedia?.('(display-mode: standalone)').matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
+
+  /** Push state of THIS device. */
+  readonly pushState = signal<'unavailable' | 'needs-install' | 'denied' | 'off' | 'on'>('off');
+
+  async refreshPushState(): Promise<void> {
+    if (!environment.vapidPublicKey || this.data.kind !== 'supabase') return this.pushState.set('unavailable');
+    if (this.isIos && !this.isStandalone) return this.pushState.set('needs-install');
+    if (!this.swPush?.isEnabled || typeof Notification === 'undefined') return this.pushState.set('unavailable');
+    if (Notification.permission === 'denied') return this.pushState.set('denied');
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
+    this.pushState.set(sub ? 'on' : 'off');
+    if (sub) void this.data.rpc('save_push_subscription', { p_subscription: sub.toJSON() }).catch(() => undefined); // keep server copy fresh
+  }
+
+  /** Must be called from a user gesture (tap) — iOS requires it for the permission prompt. */
+  async enablePush(): Promise<void> {
+    if (!this.swPush?.isEnabled || !environment.vapidPublicKey) throw new Error('Push nije podržan u ovom pregledaču.');
+    const sub = await this.swPush.requestSubscription({ serverPublicKey: environment.vapidPublicKey });
+    this.permission.set(Notification.permission);
+    await this.data.rpc('save_push_subscription', { p_subscription: sub.toJSON() });
+    if (this.prefs()) await this.data.update<NotificationPreferences>('notification_preferences', this.prefs()!.id, { push_enabled: true }).catch(() => undefined);
+    this.pushState.set('on');
+    this.clearTimers(); // the server now delivers reminders; avoid duplicate local notifications
+  }
+
+  async disablePush(): Promise<void> {
+    const reg = await navigator.serviceWorker.getRegistration();
+    const sub = await reg?.pushManager.getSubscription();
+    if (sub) {
+      const mine = await this.data.list<{ id: string; endpoint: string }>('push_subscriptions', q().eq('endpoint', sub.endpoint));
+      for (const row of mine) await this.data.remove('push_subscriptions', row.id).catch(() => undefined);
+      await sub.unsubscribe();
     }
+    this.pushState.set('off');
+  }
+
+  /** Ask the server to send a test notification to this account's devices. */
+  async sendTestPush(): Promise<number> {
+    const res = await this.data.invokeFunction<{ sent: number }>('send-reminders', { test: true });
+    return res.sent;
   }
 }

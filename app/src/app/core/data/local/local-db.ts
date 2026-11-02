@@ -16,7 +16,7 @@ const TABLES: TableName[] = [
   'profiles', 'families', 'family_members', 'family_invitations', 'children', 'medications',
   'therapy_changes', 'medication_stock', 'injections', 'growth_measurements', 'doctors',
   'doctor_visits', 'lab_tests', 'lab_results', 'documents', 'document_extractions', 'reminders',
-  'notification_preferences', 'audit_logs',
+  'notification_preferences', 'push_subscriptions', 'audit_logs',
 ];
 
 /**

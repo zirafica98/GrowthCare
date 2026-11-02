@@ -296,6 +296,10 @@ export class LocalBackend extends DataBackend {
     await this.audit('family_members', 'insert', null, m as unknown as Row);
   }
 
+  async invokeFunction<T>(): Promise<T> {
+    throw appError('unknown', null, 'Push obaveštenja rade samo sa Supabase serverom (ne u demo režimu).');
+  }
+
   // ---------------------------------------------------------------- storage
 
   /** First path segment is the family id — storage policy equivalent. */

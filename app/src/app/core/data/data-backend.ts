@@ -27,6 +27,8 @@ export abstract class DataBackend {
   abstract update<T>(table: TableName, id: string, patch: Partial<T>): Promise<T>;
   abstract remove(table: TableName, id: string): Promise<void>;
   abstract rpc<T>(fn: string, args: Record<string, unknown>): Promise<T>;
+  /** Call a server-side (Edge) function as the signed-in user. */
+  abstract invokeFunction<T>(name: string, body: Record<string, unknown>): Promise<T>;
 
   /** Private storage. Paths: {family_id}/{child_id}/{document_id}/{filename}. */
   abstract upload(path: string, file: Blob, contentType: string): Promise<void>;

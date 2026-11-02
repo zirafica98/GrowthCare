@@ -55,10 +55,30 @@ type PrefKey = keyof Pick<NotificationPreferences, 'dose_enabled' | 'missed_dose
 
       <div class="section-title"><h3>Obaveštenja</h3></div>
       <section class="card stack sm">
-        @if (notifications.permission() !== 'granted') {
-          <div class="notice info"><app-icon name="bell" [size]="18" /><span class="grow small">{{ notifications.permission() === 'denied' ? 'Obaveštenja su blokirana u podešavanjima telefona/pregledača.' : notifications.permission() === 'unsupported' ? 'Ovaj pregledač ne podržava obaveštenja. Instalirajte aplikaciju na početni ekran.' : 'Obaveštenja na uređaju nisu uključena.' }}</span>
-            @if (notifications.permission() === 'default') { <button class="btn sm primary" type="button" (click)="notifications.requestPermission()">Uključi</button> }</div>
-        }
+        <div class="push">
+          <div class="row between">
+            <div class="grow"><b class="small">Push obaveštenja na ovom telefonu</b>
+              <div class="tiny muted">Podsetnici stižu i kad je aplikacija zatvorena.</div></div>
+            @if (push() === 'on' || push() === 'off') {
+              <span class="switch"><input type="checkbox" [checked]="push() === 'on'" [disabled]="pushBusy()" (change)="togglePush($any($event.target).checked)" aria-label="Push obaveštenja na ovom telefonu" /><span></span></span>
+            }
+          </div>
+          @switch (push()) {
+            @case ('needs-install') {
+              <div class="notice info small"><app-icon name="info" [size]="16" /><span>Na iPhone-u push radi samo kad je aplikacija na početnom ekranu: u Safariju tapnite <b>Podeli</b> → <b>Dodaj na početni ekran</b>, pa otvorite GrowthCare sa početnog ekrana i uključite ovde.</span></div>
+            }
+            @case ('denied') {
+              <div class="notice warning small"><app-icon name="alert" [size]="16" /><span>Obaveštenja su blokirana. Uključite ih u podešavanjima telefona (Podešavanja → Obaveštenja → GrowthCare), pa se vratite ovde.</span></div>
+            }
+            @case ('unavailable') {
+              <div class="notice info small"><app-icon name="info" [size]="16" /><span>Push nije dostupan u ovom pregledaču ili režimu.</span></div>
+            }
+            @case ('on') {
+              <button class="btn sm outline" type="button" [disabled]="pushBusy()" (click)="testPush()"><app-icon name="bell" [size]="16" /> Pošalji probno obaveštenje</button>
+            }
+          }
+        </div>
+        <hr class="divider" />
         @if (prefs(); as p) {
           @for (t of prefRows; track t.key) {
             <label class="row between" style="min-height:44px">
@@ -102,6 +122,7 @@ type PrefKey = keyof Pick<NotificationPreferences, 'dose_enabled' | 'missed_dose
         <p class="tiny muted">Brisanje deteta je na profilu deteta. Za brisanje naloga obrišite porodicu (ili je napustite), pa nam pišite — nalog se trajno uklanja sa servera.</p>
       </section>
     </div>`,
+  styles: [`.push { display: flex; flex-direction: column; gap: 10px; }`],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsPage implements OnInit {
@@ -123,6 +144,8 @@ export class SettingsPage implements OnInit {
   readonly pwRules = PASSWORD_RULES;
   readonly prefs = this.notifications.prefs;
   readonly busy = signal(false);
+  readonly pushBusy = signal(false);
+  readonly push = this.notifications.pushState;
   readonly prefRows: { key: PrefKey; label: string }[] = [
     { key: 'dose_enabled', label: 'Dnevna doza' }, { key: 'missed_dose_enabled', label: 'Doza nije zabeležena' },
     { key: 'appointment_enabled', label: 'Kontrole kod lekara' }, { key: 'laboratory_enabled', label: 'Laboratorija' },
@@ -134,6 +157,38 @@ export class SettingsPage implements OnInit {
   async ngOnInit(): Promise<void> {
     this.fullName = this.auth.user()?.full_name ?? '';
     if (!this.prefs()) await this.notifications.loadPreferences().catch(() => undefined);
+    await this.notifications.refreshPushState().catch(() => undefined);
+  }
+
+  async togglePush(on: boolean): Promise<void> {
+    this.pushBusy.set(true);
+    try {
+      if (on) {
+        await this.notifications.enablePush();
+        this.toast.success('Push obaveštenja su uključena na ovom telefonu.');
+      } else {
+        await this.notifications.disablePush();
+        this.toast.info('Push obaveštenja su isključena na ovom telefonu.');
+      }
+    } catch (e) {
+      await this.notifications.refreshPushState().catch(() => undefined);
+      this.toast.warning(this.notifications.pushState() === 'denied' ? 'Obaveštenja su odbijena u podešavanjima telefona.' : 'Uključivanje nije uspelo. Pokušajte ponovo.');
+      void e;
+    } finally {
+      this.pushBusy.set(false);
+    }
+  }
+
+  async testPush(): Promise<void> {
+    this.pushBusy.set(true);
+    try {
+      const n = await this.notifications.sendTestPush();
+      this.toast.success(n ? 'Probno obaveštenje je poslato — trebalo bi da stigne za nekoliko sekundi.' : 'Server nije našao nijedan uređaj. Isključite i ponovo uključite push.');
+    } catch (e) {
+      this.toast.error(e);
+    } finally {
+      this.pushBusy.set(false);
+    }
   }
 
   private async savePref(patch: Partial<NotificationPreferences>): Promise<void> {

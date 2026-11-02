@@ -60,6 +60,13 @@ Novi projekat:
 - **Obaveštenja**: centar obaveštenja u aplikaciji (iz živih podataka), lokalna obaveštenja dok je aplikacija otvorena, Web Push preko `send-reminders` (opciono).
 - **Audit**: DB triggeri beleže insert/update/delete sa starim i novim vrednostima (doze, terapija, merenja, dokumenti, OCR potvrde, članstvo).
 
+## Push obaveštenja
+
+- Funkcija `supabase/functions/send-reminders` (objavljena) šalje podsetnike; poziva je pg_cron na svakih 5 min (migracija 006). Svako obaveštenje se šalje tačno jednom (`push_log`, migracija 005), vreme se računa u `APP_TIMEZONE` (Europe/Belgrade, ispravno i za letnje vreme).
+- Dozni podsetnik se ne šalje ako je doza tog dana već zabeležena; 60 min posle termina stiže „Doza još nije zabeležena”.
+- Tajne funkcije (Supabase → Edge Functions → Secrets): `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT`, `APP_TIMEZONE`. Lokalna kopija je u `supabase/.env.push` (nije u gitu).
+- Na telefonu: Podešavanja → Obaveštenja → „Push obaveštenja na ovom telefonu”. iPhone: samo za aplikaciju dodatu na početni ekran (iOS 16.4+).
+
 ## Lokalno keširani podaci (IndexedDB)
 
 | Baza | Sadržaj | Brisanje |
@@ -73,6 +80,5 @@ Originalni dokumenti se **ne** keširaju lokalno u Supabase režimu; otvaraju se
 ## Poznata ograničenja (sledeći koraci)
 
 - OCR na uređaju podržava slike (JPG/PNG); PDF i HEIC (van Safarija) idu na ručni unos ili serverski OCR.
-- Web Push zahteva VAPID ključeve i zakazivanje `send-reminders` funkcije.
 - ZIP izvoz dokumenata i brisanje naloga sa servera (zahteva admin funkciju) još nisu implementirani; JSON izvoz postoji.
 - Ilustracije su isečene iz dizajn table u niskoj rezoluciji — za produkciju izvesti originalne assete.
